@@ -1,0 +1,4089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Ads Learning Lab</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #ff9900;
+    --accent2: #146eb4;
+    --text: #e8eaf0;
+    --muted: #8892b0;
+    --success: #4caf87;
+    --error: #e05c6a;
+    --warn: #f0a500;
+    --code-bg: #0d1117;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; overflow: hidden; }
+
+  /* Sidebar */
+  #sidebar {
+    width: 280px; min-width: 280px; background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  #sidebar-header {
+    padding: 20px 16px 16px; border-bottom: 1px solid var(--border);
+  }
+  #sidebar-header h1 { font-size: 15px; color: var(--accent); letter-spacing: .5px; font-weight: 700; }
+  #sidebar-header p { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  #progress-bar-wrap { margin-top: 12px; background: var(--border); border-radius: 4px; height: 4px; }
+  #progress-bar { height: 4px; background: var(--accent); border-radius: 4px; transition: width .4s; width: 0%; }
+  #progress-label { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+  .module-group { padding: 8px 0; }
+  .module-group-title {
+    font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 4px 16px 6px; font-weight: 600;
+  }
+  .lesson-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 16px;
+    background: none; border: none; color: var(--muted); cursor: pointer; text-align: left;
+    font-size: 13px; transition: all .15s; border-left: 3px solid transparent;
+  }
+  .lesson-btn:hover { background: var(--surface2); color: var(--text); }
+  .lesson-btn.active { background: var(--surface2); color: var(--accent); border-left-color: var(--accent); }
+  .lesson-btn.done .lesson-icon { color: var(--success); }
+  .lesson-icon { font-size: 14px; flex-shrink: 0; width: 16px; text-align: center; }
+  .lesson-type-badge {
+    margin-left: auto; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .badge-read { background: #1a3a5c; color: #5aabff; }
+  .badge-quiz { background: #3a1a5c; color: #c07aff; }
+  .badge-code { background: #1a3a25; color: #5aff9f; }
+
+  /* Main */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #topbar {
+    padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--surface);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  #lesson-title { font-size: 16px; font-weight: 600; }
+  #lesson-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  #nav-btns { display: flex; gap: 8px; }
+  .nav-btn {
+    padding: 7px 16px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2);
+    color: var(--text); cursor: pointer; font-size: 13px; transition: all .15s;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn.primary { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
+  .nav-btn.primary:hover { background: #ffb733; }
+  .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  #content { flex: 1; overflow-y: auto; padding: 32px 40px; }
+
+  /* Reading */
+  .read-section h2 { font-size: 22px; margin-bottom: 8px; }
+  .read-section .tagline { color: var(--accent); font-size: 13px; margin-bottom: 24px; font-weight: 600; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 18px;
+  }
+  .card h3 { font-size: 15px; margin-bottom: 10px; color: var(--accent); }
+  .card p, .card li { font-size: 14px; line-height: 1.7; color: var(--text); }
+  .card ul, .card ol { padding-left: 18px; }
+  .card li { margin-bottom: 5px; }
+  .callout {
+    border-radius: 8px; padding: 14px 18px; margin: 14px 0; border-left: 4px solid;
+    font-size: 13.5px; line-height: 1.65;
+  }
+  .callout.info { background: #0d1f35; border-color: var(--accent2); color: #8ec6ff; }
+  .callout.tip { background: #1a2e1a; border-color: var(--success); color: #7ddfb0; }
+  .callout.warn { background: #2e200a; border-color: var(--warn); color: #f5c842; }
+  .tag-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .tag {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 12px; font-size: 12px; color: var(--muted);
+  }
+  .tag strong { color: var(--text); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+  th { background: var(--surface2); color: var(--muted); padding: 10px 12px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  code { background: var(--code-bg); color: #79c0ff; padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 12.5px; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 18px; overflow-x: auto; margin: 14px 0;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6;
+  }
+  .kw { color: #ff7b72; } .ty { color: #79c0ff; } .str { color: #a5d6ff; }
+  .cm { color: #8b949e; } .fn { color: #d2a8ff; } .nm { color: #ffa657; } .pn { color: #e8eaf0; }
+
+  /* Quiz */
+  .quiz-section h2 { font-size: 22px; margin-bottom: 6px; }
+  .quiz-section .tagline { color: #c07aff; font-size: 13px; margin-bottom: 24px; font-weight: 600; }
+  .q-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 18px; }
+  .q-block.correct { border-color: var(--success); }
+  .q-block.wrong { border-color: var(--error); }
+  .q-text { font-size: 15px; margin-bottom: 16px; line-height: 1.6; }
+  .q-num { font-size: 11px; color: var(--muted); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; }
+  .options { display: flex; flex-direction: column; gap: 9px; }
+  .opt-btn {
+    padding: 11px 15px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 7px; color: var(--text); cursor: pointer; text-align: left; font-size: 14px;
+    transition: all .15s;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: #c07aff; color: #c07aff; }
+  .opt-btn.selected { border-color: var(--accent2); background: #0d1f35; }
+  .opt-btn.correct-ans { border-color: var(--success) !important; background: #0d2a1a !important; color: var(--success) !important; }
+  .opt-btn.wrong-ans { border-color: var(--error) !important; background: #2a0d12 !important; color: var(--error) !important; }
+  .opt-btn:disabled { cursor: default; }
+  .q-feedback { margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none; }
+  .q-feedback.show { display: block; }
+  .q-feedback.ok { background: #0d2a1a; color: var(--success); }
+  .q-feedback.bad { background: #2a0d12; color: var(--error); }
+  .quiz-submit { margin-top: 8px; padding: 11px 24px; background: #7c3aed; border: none; border-radius: 7px; color: #fff; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .quiz-submit:hover { background: #6d28d9; }
+  .quiz-score { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px; text-align: center; margin-top: 18px; display: none; }
+  .quiz-score.show { display: block; }
+  .score-num { font-size: 36px; font-weight: 700; color: var(--accent); }
+  .score-label { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+  /* Code Challenge */
+  .code-section h2 { font-size: 22px; margin-bottom: 6px; }
+  .code-section .tagline { color: #5aff9f; font-size: 13px; margin-bottom: 24px; font-weight: 600; }
+  .challenge-desc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 18px; }
+  .challenge-desc h3 { font-size: 15px; color: #5aff9f; margin-bottom: 10px; }
+  .editor-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .editor-header { background: var(--surface2); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+  .editor-header span { font-size: 12px; color: var(--muted); font-family: monospace; }
+  .editor-actions { display: flex; gap: 8px; }
+  .editor-btn { padding: 5px 12px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-size: 12px; }
+  .editor-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .editor-btn.run-btn { background: #1a4d25; border-color: var(--success); color: var(--success); font-weight: 600; }
+  .editor-btn.run-btn:hover { background: #2a6d35; }
+  #code-editor {
+    width: 100%; background: var(--code-bg); color: var(--text);
+    border: none; outline: none; resize: none; padding: 18px; font-size: 13.5px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace; line-height: 1.6;
+    min-height: 220px; tab-size: 4;
+  }
+  .output-panel { background: #060810; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; min-height: 60px; font-family: monospace; font-size: 13px; }
+  .output-panel .out-line { margin-bottom: 3px; }
+  .out-ok { color: var(--success); }
+  .out-err { color: var(--error); }
+  .out-info { color: #5aabff; }
+  .solution-panel { display: none; background: var(--code-bg); border: 1px solid #2a4a2a; border-radius: 8px; padding: 18px; margin-top: 10px; }
+  .solution-panel.show { display: block; }
+  .solution-panel h4 { color: var(--success); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .hints-list { list-style: none; }
+  .hints-list li { padding: 5px 0; font-size: 13px; color: var(--muted); }
+  .hints-list li::before { content: '→ '; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div id="sidebar-header">
+    <h1>🎯 Amazon Ads Learning Lab</h1>
+    <p>Ads · APIs · MCP · Targeting</p>
+    <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+    <div id="progress-label">0 of 20 lessons complete</div>
+  </div>
+  <div id="lesson-nav"></div>
+</nav>
+
+<div id="main">
+  <div id="topbar">
+    <div>
+      <div id="lesson-title">Welcome</div>
+      <div id="lesson-meta"></div>
+    </div>
+    <div id="nav-btns">
+      <button class="nav-btn" id="btn-prev" onclick="navigate(-1)">← Prev</button>
+      <button class="nav-btn primary" id="btn-next" onclick="navigate(1)">Next →</button>
+    </div>
+  </div>
+  <div id="content"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// CURRICULUM
+// ─────────────────────────────────────────────
+const CURRICULUM = [
+
+// ══════════ MODULE 1: Amazon Ads Fundamentals ══════════
+{
+  module: "Module 1 — Amazon Ads Fundamentals",
+  id: "m1-intro", type: "read", title: "What Is Amazon Advertising?",
+  content: () => `
+  <div class="read-section">
+    <h2>What Is Amazon Advertising?</h2>
+    <p class="tagline">📖 Reading · ~7 min</p>
+    <div class="card">
+      <h3>The Big Picture</h3>
+      <p>Amazon Advertising is Amazon's self-serve and programmatic advertising platform. It lets brands, sellers, and agencies place paid ads across Amazon's properties — product search results, detail pages, Prime Video, Fire TV, Amazon Music, Twitch, and off-Amazon publisher sites.</p>
+      <p style="margin-top:10px">Amazon is the <strong>#3 digital ad platform</strong> in the US behind Google and Meta, generating over $50B/year in ad revenue. Unlike Google (intent search) and Meta (social), Amazon ads intercept buyers at the <em>moment of purchase intent</em> — making conversion rates exceptionally high.</p>
+      <div class="callout info">💡 Amazon's advertising advantage is <strong>closed-loop attribution</strong> — they can directly link an ad click to a purchase because they own the checkout. Google and Meta cannot do this.</div>
+    </div>
+    <div class="card">
+      <h3>The Full Amazon Ad Product Suite</h3>
+      <table>
+        <tr><th>Ad Type</th><th>Who Can Use</th><th>Where It Shows</th><th>Pricing</th></tr>
+        <tr><td><strong>Sponsored Products</strong></td><td>Sellers, Vendors</td><td>Search results, detail pages</td><td>CPC</td></tr>
+        <tr><td><strong>Sponsored Brands</strong></td><td>Brand-registered Sellers, Vendors</td><td>Top of search, video banner</td><td>CPC</td></tr>
+        <tr><td><strong>Sponsored Display</strong></td><td>Sellers, Vendors</td><td>On &amp; off Amazon</td><td>CPC or vCPM</td></tr>
+        <tr><td><strong>Streaming TV Ads (CTV)</strong></td><td>All advertisers via DSP or SD</td><td>Prime Video, Fire TV, Twitch, TNF</td><td>CPM</td></tr>
+        <tr><td><strong>Audio Ads</strong></td><td>All advertisers via DSP</td><td>Amazon Music, Wondery, Twitch, Alexa</td><td>CPM</td></tr>
+        <tr><td><strong>Display Ads</strong></td><td>All advertisers via DSP</td><td>Amazon properties + 3rd-party sites</td><td>CPM</td></tr>
+        <tr><td><strong>Device Ads</strong></td><td>All advertisers</td><td>Fire tablets, Echo Show, Fire TV screensaver</td><td>CPM</td></tr>
+        <tr><td><strong>Out-of-Home Ads</strong></td><td>All advertisers</td><td>On-package, in-store, locker screens</td><td>Varies</td></tr>
+        <tr><td><strong>Amazon DSP</strong></td><td>Agencies, brands (managed/self-serve)</td><td>All Amazon + publisher network</td><td>CPM</td></tr>
+      </table>
+      <div class="callout warn">⚠️ <strong>CTV ≠ DSP.</strong> Streaming TV ads can now be bought via Sponsored Display (no minimum spend) OR Amazon DSP (self-serve $10K min, managed $50K min). Don't assume CTV requires DSP access.</div>
+    </div>
+    <div class="card">
+      <h3>Streaming TV (CTV) — The Fast-Growing Format</h3>
+      <p><strong>Connected TV (CTV)</strong> means video ads delivered to internet-connected TVs and streaming devices. Amazon's CTV inventory is massive:</p>
+      <ul>
+        <li><strong>Prime Video</strong> — ad-supported tier with originals, live sports (Thursday Night Football), movies</li>
+        <li><strong>Fire TV Channels</strong> — 900+ free channels across 30+ categories</li>
+        <li><strong>Twitch</strong> — gaming, esports, music, IRL livestreams</li>
+        <li><strong>Amazon Publisher Direct (APD)</strong> — 3rd-party broadcaster apps on Fire TV</li>
+      </ul>
+      <p style="margin-top:10px">CTV ads are <strong>full-screen, non-skippable</strong>, and run 15–30 seconds. They use Amazon's first-party shopping + streaming signals for targeting (20,000+ audience segments). No cookie reliance.</p>
+    </div>
+    <div class="card">
+      <h3>Audio Ads</h3>
+      <p>10–60 second non-skippable audio ads running between music tracks or podcast episodes:</p>
+      <ul>
+        <li><strong>Amazon Music</strong> — ad-supported tier</li>
+        <li><strong>Wondery</strong> — Amazon-owned podcast network</li>
+        <li><strong>Twitch</strong> — audio during livestreams</li>
+        <li><strong>Interactive Audio</strong> — listeners can say "Alexa, add to cart" or "send me more info"</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>How the Auction Works (Sponsored Ads)</h3>
+      <p>Sponsored Products, Brands, and Display run on a <strong>generalized second-price auction</strong>. You set a maximum CPC bid; if you win, you pay <em>one cent more than the second-highest bid</em>, not your full max bid.</p>
+      <div class="callout info">💡 Winning = <strong>Relevance Score × Bid</strong>. A highly relevant listing with a lower bid can outrank a high bid on an irrelevant listing. This is why listing quality (title, images, reviews) directly affects ad cost.</div>
+    </div>
+    <div class="card">
+      <h3>Key Metrics You'll See Everywhere</h3>
+      <div class="tag-grid">
+        <div class="tag"><strong>ACOS</strong> — Advertising Cost of Sale = Spend ÷ Revenue</div>
+        <div class="tag"><strong>TACOS</strong> — Total ACOS = Ad Spend ÷ Total Revenue (organic + paid)</div>
+        <div class="tag"><strong>ROAS</strong> — Return on Ad Spend = Revenue ÷ Spend</div>
+        <div class="tag"><strong>CPC</strong> — Cost Per Click</div>
+        <div class="tag"><strong>CPM</strong> — Cost Per 1,000 Impressions (CTV, Audio, Display, DSP)</div>
+        <div class="tag"><strong>CTR</strong> — Click-Through Rate = Clicks ÷ Impressions</div>
+        <div class="tag"><strong>CVR</strong> — Conversion Rate = Orders ÷ Clicks</div>
+        <div class="tag"><strong>NTB</strong> — New-to-Brand orders (bought from your brand &lt;12 months)</div>
+        <div class="tag"><strong>VCR</strong> — Video Completion Rate (CTV / video ads)</div>
+        <div class="tag"><strong>DPVR</strong> — Detail Page View Rate</div>
+      </div>
+    </div>
+    <div class="callout tip">✅ CPC metrics chain: <strong>Impressions → Clicks (CTR) → Orders (CVR) → Revenue → ACOS</strong><br>CPM metrics chain: <strong>Impressions → VCR → Brand Searches → Detail Page Views → Purchases</strong></div>
+  </div>`
+},
+
+{
+  module: "Module 1 — Amazon Ads Fundamentals",
+  id: "m1-structure", type: "read", title: "Campaign Hierarchy",
+  content: () => `
+  <div class="read-section">
+    <h2>Campaign Hierarchy</h2>
+    <p class="tagline">📖 Reading · ~4 min</p>
+    <div class="card">
+      <h3>The 4-Level Tree</h3>
+      <p>Every Amazon ad lives inside a hierarchy. Understanding it is critical for both the console UI and the API:</p>
+      <pre>Account (Advertiser)
+  └── Portfolio  (optional budget container)
+        └── Campaign  (budget, dates, bidding strategy)
+              └── Ad Group  (default bid, targeting type)
+                    ├── Ads  (creative: ASIN + optional custom image)
+                    ├── Keywords  (for keyword-targeted ad groups)
+                    └── Product Targets  (for product/category targeting)</pre>
+      <div class="callout info">📌 An <strong>Ad Group</strong> can only contain <em>one</em> targeting type — either keyword targeting OR product targeting, never both in the same ad group.</div>
+    </div>
+    <div class="card">
+      <h3>Campaign Settings</h3>
+      <table>
+        <tr><th>Setting</th><th>Options</th><th>Notes</th></tr>
+        <tr><td>Targeting Type</td><td>Manual / Automatic</td><td>Automatic lets Amazon pick targets</td></tr>
+        <tr><td>Budget Type</td><td>Daily / Lifetime</td><td>Daily resets each calendar day</td></tr>
+        <tr><td>Bidding Strategy</td><td>Fixed CPC / Dynamic Up+Down / Down Only</td><td>Dynamic allows Amazon to adjust bids ±900%</td></tr>
+        <tr><td>Placement Modifiers</td><td>Top of Search, Product Pages, Rest of Search</td><td>% multiplier on top of your keyword bid</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Automatic vs. Manual Targeting</h3>
+      <ul>
+        <li><strong>Automatic</strong>: Amazon auto-matches your ads to relevant searches. Good for discovery; poor control. Uses "close match," "loose match," "substitutes," "complements" match types.</li>
+        <li><strong>Manual Keyword</strong>: You choose keywords + match types. Full control, requires active management.</li>
+        <li><strong>Manual Product</strong>: You target specific ASINs or entire categories. Great for conquesting competitors or defending your own detail pages.</li>
+      </ul>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 1 — Amazon Ads Fundamentals",
+  id: "m1-ctv", type: "read", title: "CTV, Audio & Emerging Formats",
+  content: () => `
+  <div class="read-section">
+    <h2>CTV, Audio & Emerging Ad Formats</h2>
+    <p class="tagline">📖 Reading · ~5 min</p>
+    <div class="card">
+      <h3>What is CTV?</h3>
+      <p><strong>Connected TV (CTV)</strong> refers to any internet-connected television — smart TVs, Fire TV sticks, Roku, Apple TV, game consoles. <strong>OTT (Over-the-Top)</strong> is the broader term for streaming video content delivered over the internet, bypassing traditional cable.</p>
+      <p style="margin-top:10px">Amazon is one of the largest CTV ad sellers in the world because it owns both the content (<strong>Prime Video</strong>) and the devices (<strong>Fire TV</strong>, with 200M+ global active users).</p>
+      <div class="callout info">💡 CTV ads have <strong>no cookies</strong> and no click-through (you can't click a TV). Success is measured by <strong>VCR (Video Completion Rate)</strong>, brand search lift, and DPVR (detail page view rate) using Amazon's attribution model.</div>
+    </div>
+    <div class="card">
+      <h3>Amazon's CTV Inventory</h3>
+      <table>
+        <tr><th>Property</th><th>Content Type</th><th>Ad Format</th></tr>
+        <tr><td><strong>Prime Video</strong></td><td>Originals, movies, live sports (Thursday Night Football)</td><td>Pre/mid-roll, pause ads</td></tr>
+        <tr><td><strong>Fire TV Channels</strong></td><td>900+ free ad-supported channels (FAST)</td><td>Pre/mid-roll</td></tr>
+        <tr><td><strong>Twitch</strong></td><td>Gaming, esports, music, IRL livestreams</td><td>Pre-roll, mid-roll, display</td></tr>
+        <tr><td><strong>Amazon Publisher Direct</strong></td><td>3rd-party streaming apps on Fire TV</td><td>Pre/mid-roll</td></tr>
+      </table>
+      <p style="margin-top:12px"><strong>Specs:</strong> 15 or 30 seconds, MP4/MOV, 1920×1080, non-skippable. Companion banner optional.</p>
+    </div>
+    <div class="card">
+      <h3>How to Buy CTV Ads</h3>
+      <table>
+        <tr><th>Path</th><th>Minimum</th><th>Access</th></tr>
+        <tr><td><strong>Sponsored Display</strong> (self-serve)</td><td>No minimum</td><td>Seller/vendor console</td></tr>
+        <tr><td><strong>Amazon DSP</strong> self-serve</td><td>$10,000/campaign recommended</td><td>DSP console or API</td></tr>
+        <tr><td><strong>Amazon DSP</strong> managed service</td><td>$50,000/campaign</td><td>Amazon account team</td></tr>
+      </table>
+      <div class="callout tip">✅ For most sellers just getting into CTV, start with <strong>Sponsored Display streaming TV</strong> — no minimum, uses the same campaign console you already know, and targets using Amazon's first-party audiences.</div>
+    </div>
+    <div class="card">
+      <h3>Audio Ads Deep Dive</h3>
+      <p>Audio ads run between music tracks or podcast episodes — <strong>non-skippable, 10–60 seconds</strong>. What makes them unique:</p>
+      <ul>
+        <li><strong>Amazon Music</strong> — ad-supported free tier across mobile, desktop, Alexa</li>
+        <li><strong>Wondery Podcasts</strong> — Amazon's owned podcast network (My Favorite Murder, Business Wars, etc.)</li>
+        <li><strong>Interactive Audio</strong> — listener says <em>"Alexa, add to cart"</em> or <em>"Alexa, remind me later"</em> — unique to Amazon</li>
+        <li>Companion display banner shown simultaneously on screen while audio plays</li>
+      </ul>
+      <div class="callout warn">⚠️ Audio ads require a voiceover creative. Amazon's Ad Studio offers <strong>free audio ad production</strong> — they'll create the voiceover from your script.</div>
+    </div>
+    <div class="card">
+      <h3>Other Emerging Formats</h3>
+      <ul>
+        <li><strong>Device Ads</strong> — screensaver/lockscreen ads on Fire tablets and Echo Show; also Fire TV screensaver placements</li>
+        <li><strong>Out-of-Home (OOH)</strong> — Amazon boxes (on-package), Whole Foods in-store screens, Amazon Hub locker screens, Amazon Go stores</li>
+        <li><strong>Amazon Live</strong> — brand-hosted shoppable livestreams on Amazon.com (like QVC but self-serve)</li>
+        <li><strong>Brand Stores</strong> — free multi-page storefront within Amazon (not paid ads, but part of the ecosystem)</li>
+        <li><strong>Posts</strong> — free social-style image posts that appear on detail pages and in feeds</li>
+      </ul>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 1 — Amazon Ads Fundamentals",
+  id: "m1-quiz", type: "quiz", title: "Quiz — Fundamentals",
+  questions: [
+    {
+      q: "Amazon Streaming TV ads (CTV) are full-screen and non-skippable. What is the PRIMARY success metric for CTV since viewers can't click?",
+      opts: ["CTR (Click-Through Rate)", "ACOS (Advertising Cost of Sale)", "VCR (Video Completion Rate) + brand search lift", "CPC (Cost Per Click)"],
+      ans: 2,
+      exp: "CTV has no clickable element on a TV. Success is measured by VCR (did they watch the whole ad?), downstream brand search lift, and detail page view rate (DPVR) — tracked via Amazon's closed-loop attribution."
+    },
+    {
+      q: "Which Amazon ad format delivers full-screen, non-skippable video ads on Prime Video, Fire TV, and Twitch?",
+      opts: ["Sponsored Brands Video", "Streaming TV Ads (CTV)", "Sponsored Display Video", "Out-of-Stream Video"],
+      ans: 1,
+      exp: "Streaming TV Ads (CTV) are full-screen, non-skippable ads that run on Prime Video, Fire TV Channels, Twitch, and Amazon Publisher Direct. They are priced on CPM and can be bought via Sponsored Display (no minimum) or Amazon DSP ($10K+ minimum)."
+    },
+    {
+      q: "An advertiser has Spend = $500 and Revenue = $2,000. What is their ACOS?",
+      opts: ["25%", "4x", "40%", "20%"],
+      ans: 0,
+      exp: "ACOS = Spend ÷ Revenue = 500 ÷ 2000 = 0.25 = 25%. ROAS would be 4x (Revenue ÷ Spend)."
+    },
+    {
+      q: "An Ad Group is set to keyword targeting. Can you also add product (ASIN) targets to the same Ad Group?",
+      opts: ["Yes, you can mix both", "No — an Ad Group supports only one targeting type", "Yes, but only for Sponsored Display", "Only if the campaign is Manual targeting"],
+      ans: 1,
+      exp: "Each Ad Group is locked to either keyword targeting OR product targeting. To use both, create separate Ad Groups."
+    },
+    {
+      q: "What does NTB mean in Amazon Ads reporting?",
+      opts: ["Net Total Budget", "New-to-Brand", "Non-Target Bid", "Native to Browser"],
+      ans: 1,
+      exp: "NTB = New-to-Brand. It measures orders from customers who haven't purchased from your brand in the past 12 months. Crucial for measuring brand growth."
+    }
+  ]
+},
+
+// ══════════ MODULE 2: Campaign Targeting Deep Dive ══════════
+{
+  module: "Module 2 — Campaign Targeting",
+  id: "m2-keywords", type: "read", title: "Keyword Targeting",
+  content: () => `
+  <div class="read-section">
+    <h2>Keyword Targeting</h2>
+    <p class="tagline">📖 Reading · ~5 min</p>
+    <div class="card">
+      <h3>The Three Match Types</h3>
+      <p>Match types control how loosely Amazon matches a shopper's search query to your keyword:</p>
+      <table>
+        <tr><th>Match Type</th><th>Your Keyword</th><th>Matches</th><th>Won't Match</th></tr>
+        <tr><td><strong>Exact</strong></td><td>[running shoes]</td><td>"running shoes"</td><td>"red running shoes", "shoes for running"</td></tr>
+        <tr><td><strong>Phrase</strong></td><td>"running shoes"</td><td>"best running shoes", "running shoes for men"</td><td>"shoes running", "run shoe"</td></tr>
+        <tr><td><strong>Broad</strong></td><td>running shoes</td><td>"jogger sneakers", "trail run footwear"</td><td>Very few exclusions</td></tr>
+      </table>
+      <div class="callout warn">⚠️ Broad match uses Amazon's semantic understanding — it can match synonyms and related concepts. Always add negative keywords with broad match to prevent wasteful spend.</div>
+    </div>
+    <div class="card">
+      <h3>Negative Keywords</h3>
+      <p>Negative keywords <em>block</em> your ad from showing on unwanted searches. They come in two flavors:</p>
+      <ul>
+        <li><strong>Negative Exact</strong>: Blocks only the exact phrase, in order</li>
+        <li><strong>Negative Phrase</strong>: Blocks any search containing the phrase</li>
+      </ul>
+      <div class="callout tip">✅ Best practice: run an auto campaign for 2-4 weeks, mine the Search Term Report for irrelevant queries, add those as negatives to your manual campaigns.</div>
+    </div>
+    <div class="card">
+      <h3>Keyword Harvesting Workflow</h3>
+      <ol>
+        <li>Launch <strong>auto campaign</strong> at moderate bid (~$0.75–$1.00)</li>
+        <li>After 2–4 weeks, download <strong>Search Term Report</strong></li>
+        <li>Filter for queries with Orders > 0 or high CTR</li>
+        <li>Add winners as <strong>exact match</strong> in a new manual campaign with higher bid</li>
+        <li>Add losers as <strong>negative exact</strong> in the auto campaign</li>
+        <li>Repeat every 2–4 weeks</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Bid Strategies</h3>
+      <table>
+        <tr><th>Strategy</th><th>Behavior</th><th>Best For</th></tr>
+        <tr><td>Fixed CPC</td><td>Amazon never adjusts your bid</td><td>Tight budget control</td></tr>
+        <tr><td>Dynamic Down Only</td><td>Amazon lowers bids for low-conversion placements</td><td>Efficiency focus</td></tr>
+        <tr><td>Dynamic Up + Down</td><td>Amazon adjusts bids up or down based on conversion likelihood</td><td>Growth / aggressive bidding</td></tr>
+      </table>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 2 — Campaign Targeting",
+  id: "m2-product-targeting", type: "read", title: "Product & Audience Targeting",
+  content: () => `
+  <div class="read-section">
+    <h2>Product & Audience Targeting</h2>
+    <p class="tagline">📖 Reading · ~5 min</p>
+    <div class="card">
+      <h3>Product Targeting (ASIN & Category)</h3>
+      <p>Instead of keywords, you target specific products or categories. Your ad appears on competitor or complementary product detail pages.</p>
+      <ul>
+        <li><strong>Individual ASIN targeting</strong>: Show your ad on a specific product's page. Great for conquesting.</li>
+        <li><strong>Category targeting</strong>: Show your ad on all products within an Amazon category. Cast a wider net.</li>
+        <li><strong>Refined category targeting</strong>: Filter category targets by price range, star rating, Prime eligibility, or brand.</li>
+      </ul>
+      <div class="callout tip">✅ Target your OWN ASINs to prevent competitors from stealing buyers who are already looking at you.</div>
+    </div>
+    <div class="card">
+      <h3>Sponsored Display Audiences</h3>
+      <p>Available only for Sponsored Display (and DSP). Targets shoppers based on behavior, not search context:</p>
+      <table>
+        <tr><th>Audience Type</th><th>Who</th></tr>
+        <tr><td><strong>Remarketing — Views</strong></td><td>Shoppers who viewed your detail pages but didn't buy</td></tr>
+        <tr><td><strong>Remarketing — Purchases</strong></td><td>Shoppers who already bought your product (cross-sell)</td></tr>
+        <tr><td><strong>In-Market</strong></td><td>Shoppers actively browsing a category right now</td></tr>
+        <tr><td><strong>Lifestyle</strong></td><td>Shoppers defined by broader interest patterns (e.g., "health-conscious")</td></tr>
+        <tr><td><strong>Life Events</strong></td><td>Shoppers in transitional moments (new parent, moved recently)</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>DSP Targeting Layers</h3>
+      <p>Amazon DSP adds even more granular control:</p>
+      <ul>
+        <li><strong>Amazon Audiences</strong>: First-party data from Amazon shopping, streaming, Alexa</li>
+        <li><strong>Contextual</strong>: Pages matching specific topics or categories</li>
+        <li><strong>Pixel-based</strong>: Your own website visitors via Amazon Publisher Services</li>
+        <li><strong>Lookalike</strong>: Shoppers similar to your existing buyer list</li>
+      </ul>
+      <div class="callout info">💡 DSP uses CPM (cost per 1,000 impressions) not CPC. Minimum spends are typically $10–35k/month.</div>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 2 — Campaign Targeting",
+  id: "m2-quiz", type: "quiz", title: "Quiz — Targeting",
+  questions: [
+    {
+      q: "You're selling protein powder. A shopper searches 'best whey protein supplement for muscle gain'. Which keyword match type for 'whey protein' would capture this search?",
+      opts: ["Exact match only", "Phrase match", "Both phrase and broad match", "Negative keyword"],
+      ans: 2,
+      exp: "Phrase match [\"whey protein\"] matches any query containing 'whey protein' in order. Broad match would also match it (and more). Exact would NOT match because the search has words before/after."
+    },
+    {
+      q: "What is the purpose of a Negative Phrase keyword?",
+      opts: [
+        "Prevents your ad from showing on any search containing that phrase",
+        "Prevents your ad from showing only when the exact phrase is searched alone",
+        "Boosts bids on high-performing phrases",
+        "Marks phrases for A/B testing"
+      ],
+      ans: 0,
+      exp: "Negative Phrase blocks all searches containing the phrase anywhere in the query. Negative Exact only blocks the exact standalone phrase."
+    },
+    {
+      q: "You want to show your product ad on a competitor's specific detail page. Which targeting type do you use?",
+      opts: ["Keyword — Broad", "Audience — In-Market", "Product — Individual ASIN", "Sponsored Brands video"],
+      ans: 2,
+      exp: "Individual ASIN product targeting places your ad on a competitor's specific product detail page."
+    },
+    {
+      q: "Which audience targeting type in Sponsored Display reaches shoppers who VIEWED your product but didn't purchase?",
+      opts: ["In-Market", "Lifestyle", "Remarketing — Views", "Remarketing — Purchases"],
+      ans: 2,
+      exp: "Remarketing — Views retargets window-shoppers: people who viewed your detail pages but left without buying."
+    },
+    {
+      q: "Amazon DSP uses which pricing model?",
+      opts: ["CPC (cost per click)", "CPA (cost per acquisition)", "CPM (cost per thousand impressions)", "CPV (cost per view)"],
+      ans: 2,
+      exp: "DSP is programmatic display advertising priced on CPM. You pay per 1,000 impressions, not per click."
+    }
+  ]
+},
+
+// ══════════ MODULE 3: Amazon Ads API ══════════
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-api-overview", type: "read", title: "API Overview & Auth",
+  content: () => `
+  <div class="read-section">
+    <h2>Amazon Ads API — Overview & Authentication</h2>
+    <p class="tagline">📖 Reading · ~6 min</p>
+    <div class="card">
+      <h3>What is the Amazon Ads API?</h3>
+      <p>The Amazon Advertising API is a REST API that gives programmatic access to everything in Amazon Ads: campaigns, ad groups, keywords, bids, budgets, and reports. It's the engine behind every third-party ads management tool (Perpetua, Pacvue, Skai, etc.).</p>
+      <div class="callout warn">⚠️ <strong>API v2 is deprecated.</strong> All new development must use <strong>v3</strong> for Sponsored Products, Sponsored Brands, and Sponsored Display. The v3 APIs use versioned <code>Accept</code> headers and have different request/response shapes than v2.</div>
+      <table>
+        <tr><th>Product</th><th>Base URL</th><th>Notes</th></tr>
+        <tr><td>Sponsored Products v3</td><td><code>https://advertising.amazon.com/sp/</code></td><td>Current — use versioned Accept header</td></tr>
+        <tr><td>Sponsored Brands v3</td><td><code>https://advertising.amazon.com/sb/</code></td><td>Current</td></tr>
+        <tr><td>Sponsored Display v3</td><td><code>https://advertising.amazon.com/sd/</code></td><td>Current</td></tr>
+        <tr><td>Sponsored TV</td><td><code>https://advertising.amazon.com/stv/</code></td><td>Newer self-serve CTV API</td></tr>
+        <tr><td>DSP</td><td><code>https://advertising.amazon.com/dsp/</code></td><td>Separate auth scope</td></tr>
+        <tr><td>Reports v3</td><td><code>https://advertising.amazon.com/reporting/reports</code></td><td>Async — poll for completion</td></tr>
+        <tr><td>Amazon Marketing Cloud</td><td><code>https://marketing-stream.amazon.com/</code></td><td>SQL clean room — see Module 6</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Authentication — Login with Amazon (LWA)</h3>
+      <p>The API uses <strong>OAuth 2.0</strong> via Amazon's LWA (Login with Amazon) service. Two grant types:</p>
+      <table>
+        <tr><th>Grant Type</th><th>Use Case</th><th>Token Type</th></tr>
+        <tr><td>Authorization Code</td><td>3rd-party apps acting on behalf of advertisers</td><td>Access + Refresh token</td></tr>
+        <tr><td>Client Credentials</td><td>Server-to-server (your own account only)</td><td>Access token</td></tr>
+      </table>
+      <pre><span class="cm">// Step 1: Exchange code for tokens</span>
+<span class="kw">POST</span> https://api.amazon.com/auth/o2/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code
+&code=<span class="str">AUTH_CODE</span>
+&redirect_uri=<span class="str">https://yourapp.com/callback</span>
+&client_id=<span class="str">amzn1.application-oa2-client.xxx</span>
+&client_secret=<span class="str">your_secret</span>
+
+<span class="cm">// Response</span>
+{
+  <span class="str">"access_token"</span>: <span class="str">"Atza|..."</span>,       <span class="cm">// expires in 1 hour</span>
+  <span class="str">"refresh_token"</span>: <span class="str">"Atzr|..."</span>,     <span class="cm">// long-lived, store securely</span>
+  <span class="str">"token_type"</span>: <span class="str">"bearer"</span>,
+  <span class="str">"expires_in"</span>: <span class="nm">3600</span>
+}</pre>
+    </div>
+    <div class="card">
+      <h3>Required Headers on Every Request</h3>
+      <pre>Authorization: Bearer <span class="str">Atza|access_token_here</span>
+Amazon-Advertising-API-ClientId: <span class="str">amzn1.application-oa2-client.xxx</span>
+Amazon-Advertising-API-Scope: <span class="str">1234567890</span>   <span class="cm">// Profile ID</span>
+Content-Type: application/json</pre>
+      <div class="callout warn">⚠️ The <code>Amazon-Advertising-API-Scope</code> header is the <strong>Profile ID</strong> — not your seller/vendor account ID. You must first call <code>GET /v2/profiles</code> to discover profile IDs.</div>
+    </div>
+    <div class="card">
+      <h3>Rate Limiting</h3>
+      <ul>
+        <li>Limits are per endpoint and per client ID, not global</li>
+        <li>Most read endpoints: ~5 req/s burst, ~0.5 req/s sustained</li>
+        <li>Writes (create/update): lower limits, often 1–2 req/s</li>
+        <li>When rate limited: HTTP <code>429 Too Many Requests</code></li>
+        <li>Strategy: exponential backoff with jitter; check <code>Retry-After</code> header</li>
+      </ul>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-endpoints", type: "read", title: "Key Endpoints & Data Models (v3)",
+  content: () => `
+  <div class="read-section">
+    <h2>Key Endpoints & Data Models (SP API v3)</h2>
+    <p class="tagline">📖 Reading · ~7 min</p>
+    <div class="card">
+      <h3>The Critical v3 Difference: Versioned Accept Headers</h3>
+      <p>In SP API v3, you don't just change the URL — you send a versioned <code>Accept</code> header that tells Amazon which schema version you expect back. This is what breaks v2 clients silently.</p>
+      <pre><span class="cm">// v3 Campaign list — note the Accept header</span>
+<span class="kw">GET</span> https://advertising.amazon.com/sp/campaigns
+Accept: <span class="str">application/vnd.spCampaign.v3+json</span>
+Amazon-Advertising-API-ClientId: <span class="str">amzn1.application-oa2-client.xxx</span>
+Amazon-Advertising-API-Scope: <span class="str">1234567890</span>
+Authorization: Bearer <span class="str">Atza|...</span>
+
+<span class="cm">// v3 response — note "campaigns" wrapper + new fields</span>
+{
+  <span class="str">"campaigns"</span>: [{
+    <span class="str">"campaignId"</span>: <span class="str">"9876543210"</span>,   <span class="cm">// STRING in v3, not int!</span>
+    <span class="str">"name"</span>: <span class="str">"SP | Brand | Exact"</span>,
+    <span class="str">"state"</span>: <span class="str">"ENABLED"</span>,             <span class="cm">// UPPERCASE in v3</span>
+    <span class="str">"targetingType"</span>: <span class="str">"MANUAL"</span>,
+    <span class="str">"budget"</span>: { <span class="str">"budget"</span>: <span class="nm">50.00</span>, <span class="str">"budgetType"</span>: <span class="str">"DAILY"</span> },
+    <span class="str">"startDate"</span>: <span class="str">"2024-01-01"</span>       <span class="cm">// ISO 8601 in v3, not YYYYMMDD</span>
+  }],
+  <span class="str">"totalResults"</span>: <span class="nm">1</span>
+}</pre>
+      <div class="callout warn">⚠️ <strong>Three breaking changes from v2 to v3:</strong> (1) campaignId is now a <strong>string</strong>, not an integer. (2) State values are <strong>UPPERCASE</strong>. (3) Dates use <strong>ISO 8601</strong> (2024-01-01) not YYYYMMDD.</div>
+    </div>
+    <div class="card">
+      <h3>Profile Discovery (unchanged)</h3>
+      <pre><span class="kw">GET</span> https://advertising.amazon.com/v2/profiles
+<span class="cm">// Still v2 — profiles endpoint has not changed</span>
+[{
+  <span class="str">"profileId"</span>: <span class="nm">1234567890</span>,
+  <span class="str">"countryCode"</span>: <span class="str">"US"</span>,
+  <span class="str">"currencyCode"</span>: <span class="str">"USD"</span>,
+  <span class="str">"accountInfo"</span>: {
+    <span class="str">"marketplaceStringId"</span>: <span class="str">"ATVPDKIKX0DER"</span>,
+    <span class="str">"id"</span>: <span class="str">"A1B2C3D4E5"</span>,
+    <span class="str">"type"</span>: <span class="str">"seller"</span>
+  }
+}]</pre>
+    </div>
+    <div class="card">
+      <h3>Campaign CRUD (v3)</h3>
+      <pre><span class="cm">// Create campaigns — POST with versioned Content-Type</span>
+<span class="kw">POST</span> /sp/campaigns
+Content-Type: <span class="str">application/vnd.spCampaign.v3+json</span>
+Accept:       <span class="str">application/vnd.spCampaign.v3+json</span>
+
+{
+  <span class="str">"campaigns"</span>: [{
+    <span class="str">"name"</span>: <span class="str">"SP | Brand | Exact"</span>,
+    <span class="str">"targetingType"</span>: <span class="str">"MANUAL"</span>,
+    <span class="str">"state"</span>: <span class="str">"ENABLED"</span>,
+    <span class="str">"budget"</span>: { <span class="str">"budget"</span>: <span class="nm">50.00</span>, <span class="str">"budgetType"</span>: <span class="str">"DAILY"</span> },
+    <span class="str">"startDate"</span>: <span class="str">"2024-01-01"</span>
+  }]
+}
+
+<span class="cm">// v3 response includes per-item success/error</span>
+{
+  <span class="str">"campaigns"</span>: {
+    <span class="str">"success"</span>: [{ <span class="str">"campaignId"</span>: <span class="str">"9876543210"</span>, <span class="str">"index"</span>: <span class="nm">0</span> }],
+    <span class="str">"error"</span>: []
+  }
+}</pre>
+    </div>
+    <div class="card">
+      <h3>Keyword Operations (v3)</h3>
+      <pre><span class="kw">POST</span> /sp/keywords
+Content-Type: <span class="str">application/vnd.spKeyword.v3+json</span>
+
+{
+  <span class="str">"keywords"</span>: [{
+    <span class="str">"adGroupId"</span>: <span class="str">"111222333"</span>,     <span class="cm">// string in v3</span>
+    <span class="str">"campaignId"</span>: <span class="str">"9876543210"</span>,
+    <span class="str">"keywordText"</span>: <span class="str">"wireless earbuds"</span>,
+    <span class="str">"matchType"</span>: <span class="str">"EXACT"</span>,           <span class="cm">// UPPERCASE</span>
+    <span class="str">"bid"</span>: { <span class="str">"bid"</span>: <span class="nm">1.25</span> },
+    <span class="str">"state"</span>: <span class="str">"ENABLED"</span>
+  }]
+}</pre>
+    </div>
+    <div class="card">
+      <h3>Reports API (v3 Async — unchanged flow)</h3>
+      <pre><span class="cm">// 1. Create report — POST</span>
+<span class="kw">POST</span> https://advertising.amazon.com/reporting/reports
+{
+  <span class="str">"name"</span>: <span class="str">"SP Search Term Report"</span>,
+  <span class="str">"startDate"</span>: <span class="str">"2024-01-01"</span>,
+  <span class="str">"endDate"</span>: <span class="str">"2024-01-31"</span>,
+  <span class="str">"configuration"</span>: {
+    <span class="str">"adProduct"</span>: <span class="str">"SPONSORED_PRODUCTS"</span>,
+    <span class="str">"groupBy"</span>: [<span class="str">"searchTerm"</span>],
+    <span class="str">"columns"</span>: [<span class="str">"impressions"</span>, <span class="str">"clicks"</span>, <span class="str">"cost"</span>, <span class="str">"purchases7d"</span>, <span class="str">"sales7d"</span>],
+    <span class="str">"reportTypeId"</span>: <span class="str">"spSearchTerm"</span>,
+    <span class="str">"timeUnit"</span>: <span class="str">"SUMMARY"</span>,
+    <span class="str">"format"</span>: <span class="str">"GZIP_JSON"</span>
+  }
+}
+<span class="cm">// Returns: { "reportId": "abc123", "status": "PENDING" }</span>
+
+<span class="cm">// 2. Poll — GET (every 10–30s)</span>
+<span class="kw">GET</span> https://advertising.amazon.com/reporting/reports/{reportId}
+<span class="cm">// status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED"</span>
+<span class="cm">// On COMPLETED: response includes "url" (presigned S3, expires in 30min)</span>
+
+<span class="cm">// 3. Download — GET the presigned URL, decompress gzip, parse JSON</span></pre>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-code1", type: "code", title: "Go: API Client Structs",
+  challenge: {
+    title: "Build the Amazon Ads API Client Structs",
+    desc: `Define the core Go structs needed to work with the Amazon Ads API.
+You need to model: the auth token response from LWA, an API client with the required headers, and the Campaign data model.`,
+    requirements: [
+      "Define a `TokenResponse` struct with fields: AccessToken (string), RefreshToken (string), ExpiresIn (int), TokenType (string) — use proper JSON tags",
+      "Define an `AdsClient` struct with: ClientID, ProfileID, AccessToken (all strings) and an http.Client",
+      "Define a `Campaign` struct with: CampaignID (int64), Name, State, TargetingType (strings), DailyBudget (float64), StartDate (string) — JSON tags must match the API (camelCase)",
+      "Add a `NewAdsClient(clientID, profileID, accessToken string) *AdsClient` constructor"
+    ],
+    starter: `package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+// TODO: Define TokenResponse struct
+// Fields: access_token, refresh_token, expires_in, token_type
+
+
+// TODO: Define AdsClient struct
+// Fields: ClientID, ProfileID, AccessToken, HTTPClient
+
+
+// TODO: Define Campaign struct
+// Fields: campaignId (int64), name, state, targetingType, dailyBudget, startDate
+
+
+// TODO: Implement NewAdsClient constructor
+
+
+func main() {
+	client := NewAdsClient(
+		"amzn1.application-oa2-client.abc123",
+		"1234567890",
+		"Atza|someAccessToken",
+	)
+
+	campaign := Campaign{
+		CampaignID:    9876543210,
+		Name:          "SP | Brand | Exact",
+		State:         "enabled",
+		TargetingType: "manual",
+		DailyBudget:   50.00,
+		StartDate:     "20240101",
+	}
+
+	fmt.Printf("Client Profile: %s\\n", client.ProfileID)
+	fmt.Printf("Campaign: %s (Budget: $%.2f)\\n", campaign.Name, campaign.DailyBudget)
+}
+`,
+    solution: `package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+type TokenResponse struct {
+	AccessToken  string \`json:"access_token"\`
+	RefreshToken string \`json:"refresh_token"\`
+	ExpiresIn    int    \`json:"expires_in"\`
+	TokenType    string \`json:"token_type"\`
+}
+
+type AdsClient struct {
+	ClientID    string
+	ProfileID   string
+	AccessToken string
+	HTTPClient  *http.Client
+}
+
+type Campaign struct {
+	CampaignID    int64   \`json:"campaignId"\`
+	Name          string  \`json:"name"\`
+	State         string  \`json:"state"\`
+	TargetingType string  \`json:"targetingType"\`
+	DailyBudget   float64 \`json:"dailyBudget"\`
+	StartDate     string  \`json:"startDate"\`
+}
+
+func NewAdsClient(clientID, profileID, accessToken string) *AdsClient {
+	return &AdsClient{
+		ClientID:    clientID,
+		ProfileID:   profileID,
+		AccessToken: accessToken,
+		HTTPClient:  &http.Client{},
+	}
+}
+
+func main() {
+	client := NewAdsClient(
+		"amzn1.application-oa2-client.abc123",
+		"1234567890",
+		"Atza|someAccessToken",
+	)
+
+	campaign := Campaign{
+		CampaignID:    9876543210,
+		Name:          "SP | Brand | Exact",
+		State:         "enabled",
+		TargetingType: "manual",
+		DailyBudget:   50.00,
+		StartDate:     "20240101",
+	}
+
+	fmt.Printf("Client Profile: %s\\n", client.ProfileID)
+	fmt.Printf("Campaign: %s (Budget: $%.2f)\\n", campaign.Name, campaign.DailyBudget)
+}`,
+    checks: [
+      { pattern: /type\s+TokenResponse\s+struct/, msg: "TokenResponse struct defined" },
+      { pattern: /access_token/, msg: "access_token JSON tag present" },
+      { pattern: /refresh_token/, msg: "refresh_token JSON tag present" },
+      { pattern: /type\s+AdsClient\s+struct/, msg: "AdsClient struct defined" },
+      { pattern: /\*http\.Client/, msg: "HTTPClient field is *http.Client" },
+      { pattern: /type\s+Campaign\s+struct/, msg: "Campaign struct defined" },
+      { pattern: /int64/, msg: "CampaignID is int64" },
+      { pattern: /float64/, msg: "DailyBudget is float64" },
+      { pattern: /func\s+NewAdsClient/, msg: "NewAdsClient constructor defined" },
+      { pattern: /return\s+&AdsClient/, msg: "Constructor returns pointer to AdsClient" },
+    ]
+  }
+},
+
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-code2", type: "code", title: "Go: HTTP Request with Headers",
+  challenge: {
+    title: "Implement an API Request Method",
+    desc: "Add a `Get` method to AdsClient that makes a properly authenticated GET request to the Amazon Ads API, setting all required headers.",
+    requirements: [
+      "Add a `Get(endpoint string) (*http.Response, error)` method on `*AdsClient`",
+      "Set `Authorization: Bearer <AccessToken>` header",
+      "Set `Amazon-Advertising-API-ClientId` header to ClientID",
+      "Set `Amazon-Advertising-API-Scope` header to ProfileID",
+      "Set `Content-Type: application/json` header",
+      "Use the base URL `https://advertising.amazon.com` + endpoint",
+    ],
+    starter: `package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+type AdsClient struct {
+	ClientID    string
+	ProfileID   string
+	AccessToken string
+	HTTPClient  *http.Client
+	BaseURL     string
+}
+
+func NewAdsClient(clientID, profileID, accessToken string) *AdsClient {
+	return &AdsClient{
+		ClientID:    clientID,
+		ProfileID:   profileID,
+		AccessToken: accessToken,
+		HTTPClient:  &http.Client{},
+		BaseURL:     "https://advertising.amazon.com",
+	}
+}
+
+// TODO: Add Get(endpoint string) (*http.Response, error) method
+// that builds the request with all required Amazon Ads API headers
+
+
+func main() {
+	client := NewAdsClient("client123", "9876543210", "Atza|token123")
+
+	// Simulate what the request would look like
+	req, err := http.NewRequest("GET", client.BaseURL+"/v2/profiles", nil)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Call your method logic manually for demo
+	req.Header.Set("Authorization", "Bearer "+client.AccessToken)
+	req.Header.Set("Amazon-Advertising-API-ClientId", client.ClientID)
+	req.Header.Set("Amazon-Advertising-API-Scope", client.ProfileID)
+	req.Header.Set("Content-Type", "application/json")
+
+	fmt.Println("Auth header:", req.Header.Get("Authorization"))
+	fmt.Println("ClientId header:", req.Header.Get("Amazon-Advertising-API-ClientId"))
+	fmt.Println("Scope header:", req.Header.Get("Amazon-Advertising-API-Scope"))
+}
+`,
+    solution: `package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+type AdsClient struct {
+	ClientID    string
+	ProfileID   string
+	AccessToken string
+	HTTPClient  *http.Client
+	BaseURL     string
+}
+
+func NewAdsClient(clientID, profileID, accessToken string) *AdsClient {
+	return &AdsClient{
+		ClientID:    clientID,
+		ProfileID:   profileID,
+		AccessToken: accessToken,
+		HTTPClient:  &http.Client{},
+		BaseURL:     "https://advertising.amazon.com",
+	}
+}
+
+func (c *AdsClient) Get(endpoint string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", c.BaseURL+endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.AccessToken)
+	req.Header.Set("Amazon-Advertising-API-ClientId", c.ClientID)
+	req.Header.Set("Amazon-Advertising-API-Scope", c.ProfileID)
+	req.Header.Set("Content-Type", "application/json")
+	return c.HTTPClient.Do(req)
+}
+
+func main() {
+	client := NewAdsClient("client123", "9876543210", "Atza|token123")
+
+	req, err := http.NewRequest("GET", client.BaseURL+"/v2/profiles", nil)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+client.AccessToken)
+	req.Header.Set("Amazon-Advertising-API-ClientId", client.ClientID)
+	req.Header.Set("Amazon-Advertising-API-Scope", client.ProfileID)
+	req.Header.Set("Content-Type", "application/json")
+
+	fmt.Println("Auth header:", req.Header.Get("Authorization"))
+	fmt.Println("ClientId header:", req.Header.Get("Amazon-Advertising-API-ClientId"))
+	fmt.Println("Scope header:", req.Header.Get("Amazon-Advertising-API-Scope"))
+}`,
+    checks: [
+      { pattern: /func\s*\(\s*\w+\s*\*AdsClient\s*\)\s*Get/, msg: "Get method defined on *AdsClient" },
+      { pattern: /Bearer\s*"\s*\+/, msg: "Authorization header uses Bearer + token" },
+      { pattern: /Amazon-Advertising-API-ClientId/, msg: "ClientId header set" },
+      { pattern: /Amazon-Advertising-API-Scope/, msg: "Scope (ProfileID) header set" },
+      { pattern: /Content-Type.*application\/json/, msg: "Content-Type header set" },
+      { pattern: /http\.NewRequest/, msg: "Uses http.NewRequest" },
+    ]
+  }
+},
+
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-bulk", type: "read", title: "Bulk Operations & Budget Rules",
+  content: () => `
+  <div class="read-section">
+    <h2>Bulk Operations & Budget Rules API</h2>
+    <p class="tagline">📖 Reading · ~6 min</p>
+    <div class="card">
+      <h3>Why Bulk Operations Matter for AI Agents</h3>
+      <p>An AI agent managing campaigns at scale cannot afford to make one HTTP request per keyword update — with 10,000 keywords, that's 10,000 API calls at rate-limited speed. <strong>Bulk operations</strong> let you send thousands of creates/updates in a single request.</p>
+      <div class="callout info">💡 SP API v3 endpoints already accept arrays (up to 1,000 items per request). For even larger scale, Amazon has a dedicated <strong>Bulk Sheet</strong> API that accepts CSV files via S3.</div>
+    </div>
+    <div class="card">
+      <h3>v3 Batch Limits</h3>
+      <table>
+        <tr><th>Operation</th><th>Max per Request</th><th>Endpoint</th></tr>
+        <tr><td>Create campaigns</td><td>1,000</td><td>POST /sp/campaigns</td></tr>
+        <tr><td>Update campaigns</td><td>1,000</td><td>PUT /sp/campaigns</td></tr>
+        <tr><td>Create keywords</td><td>1,000</td><td>POST /sp/keywords</td></tr>
+        <tr><td>Update keyword bids</td><td>1,000</td><td>PUT /sp/keywords</td></tr>
+        <tr><td>Create product targets</td><td>1,000</td><td>POST /sp/targets</td></tr>
+      </table>
+      <p style="margin-top:10px">v3 batch responses include per-item <code>success</code> and <code>error</code> arrays — always check both:</p>
+      <pre>{
+  <span class="str">"keywords"</span>: {
+    <span class="str">"success"</span>: [{ <span class="str">"keywordId"</span>: <span class="str">"111"</span>, <span class="str">"index"</span>: <span class="nm">0</span> }],
+    <span class="str">"error"</span>: [{
+      <span class="str">"index"</span>: <span class="nm">1</span>,
+      <span class="str">"errors"</span>: [{ <span class="str">"errorType"</span>: <span class="str">"DUPLICATE_KEYWORD"</span>, <span class="str">"message"</span>: <span class="str">"..."</span> }]
+    }]
+  }
+}</pre>
+    </div>
+    <div class="card">
+      <h3>Budget Rules API</h3>
+      <p>Budget Rules let you programmatically schedule budget changes — critical for an AI agent that wants to increase budgets during peak hours or sales events.</p>
+      <pre><span class="cm">// Create a budget rule — increase budget during Prime Day</span>
+<span class="kw">POST</span> /sp/budgetRules
+{
+  <span class="str">"budgetRules"</span>: [{
+    <span class="str">"name"</span>: <span class="str">"Prime Day Boost"</span>,
+    <span class="str">"type"</span>: <span class="str">"SCHEDULE"</span>,
+    <span class="str">"budgetRuleDetails"</span>: {
+      <span class="str">"type"</span>: <span class="str">"DATE_RANGE"</span>,
+      <span class="str">"startDate"</span>: <span class="str">"2025-07-08"</span>,
+      <span class="str">"endDate"</span>: <span class="str">"2025-07-09"</span>
+    },
+    <span class="str">"budgetIncreaseBy"</span>: { <span class="str">"type"</span>: <span class="str">"PERCENT"</span>, <span class="str">"value"</span>: <span class="nm">200</span> }
+  }]
+}
+
+<span class="cm">// Associate rule with a campaign</span>
+<span class="kw">POST</span> /sp/campaigns/budgetRules
+{
+  <span class="str">"campaignBudgetRuleAssociations"</span>: [{
+    <span class="str">"campaignId"</span>: <span class="str">"9876543210"</span>,
+    <span class="str">"budgetRuleId"</span>: <span class="str">"rule-abc-123"</span>
+  }]
+}</pre>
+    </div>
+    <div class="card">
+      <h3>Recommendations API</h3>
+      <p>Amazon exposes their own ML-generated recommendations for bids and targeting — your AI agent should consume these as a signal, not replace them entirely.</p>
+      <pre><span class="cm">// Get bid recommendations for keywords</span>
+<span class="kw">POST</span> /sp/keywords/bidRecommendations
+{
+  <span class="str">"keywords"</span>: [
+    { <span class="str">"keywordId"</span>: <span class="str">"111222333"</span> }
+  ]
+}
+
+<span class="cm">// Response</span>
+{
+  <span class="str">"keywordsBidRecommendations"</span>: [{
+    <span class="str">"keywordId"</span>: <span class="str">"111222333"</span>,
+    <span class="str">"suggestedBid"</span>: {
+      <span class="str">"rangeStart"</span>: <span class="nm">0.85</span>,
+      <span class="str">"rangeEnd"</span>: <span class="nm">1.45</span>,
+      <span class="str">"suggested"</span>: <span class="nm">1.15</span>
+    }
+  }]
+}
+
+<span class="cm">// Get keyword suggestions for a campaign/ASIN</span>
+<span class="kw">POST</span> /sp/targets/keywords/recommendations
+{
+  <span class="str">"asins"</span>: [<span class="str">"B08XYZ12345"</span>],
+  <span class="str">"maxRecommendations"</span>: <span class="nm">100</span>
+}</pre>
+      <div class="callout tip">✅ Agent strategy: blend Amazon's <code>suggestedBid</code> with your own Target ACOS formula. E.g.: <code>finalBid = 0.6 × yourBid + 0.4 × amazonSuggestedBid</code> for a hybrid approach.</div>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-code-retry", type: "code", title: "Go: Retry with Exponential Backoff",
+  challenge: {
+    title: "Implement Exponential Backoff Retry",
+    desc: "Production API clients must handle 429 rate limits and transient 5xx errors gracefully. Build a retry wrapper that any API call can use.",
+    requirements: [
+      "Define `RetryConfig` struct with: MaxAttempts (int), BaseDelay (time.Duration), MaxDelay (time.Duration)",
+      "Implement `WithRetry(cfg RetryConfig, fn func() error) error` — calls fn, retries on error",
+      "After attempt N, wait: min(BaseDelay × 2^N, MaxDelay) — exponential backoff",
+      "Add jitter: multiply wait by a random float in [0.5, 1.5] to prevent thundering herd",
+      "Return nil on first success; return last error if all attempts exhausted",
+      "Print each attempt number and wait duration to stderr for observability",
+    ],
+    starter: `package main
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"math/rand"
+	"time"
+)
+
+// TODO: Define RetryConfig struct
+// Fields: MaxAttempts int, BaseDelay time.Duration, MaxDelay time.Duration
+
+
+// TODO: Implement WithRetry(cfg RetryConfig, fn func() error) error
+// Exponential backoff: delay = min(BaseDelay * 2^attempt, MaxDelay) * jitter[0.5,1.5]
+
+
+func main() {
+	cfg := RetryConfig{
+		MaxAttempts: 5,
+		BaseDelay:   100 * time.Millisecond,
+		MaxDelay:    5 * time.Second,
+	}
+
+	attempt := 0
+	err := WithRetry(cfg, func() error {
+		attempt++
+		if attempt < 4 {
+			return errors.New("429 Too Many Requests")
+		}
+		return nil // success on 4th attempt
+	})
+
+	if err != nil {
+		fmt.Println("All attempts failed:", err)
+	} else {
+		fmt.Printf("Succeeded on attempt %d\\n", attempt)
+	}
+}
+`,
+    solution: `package main
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"math/rand"
+	"time"
+)
+
+type RetryConfig struct {
+	MaxAttempts int
+	BaseDelay   time.Duration
+	MaxDelay    time.Duration
+}
+
+func WithRetry(cfg RetryConfig, fn func() error) error {
+	var lastErr error
+	for i := 0; i < cfg.MaxAttempts; i++ {
+		if err := fn(); err == nil {
+			return nil
+		} else {
+			lastErr = err
+		}
+		if i == cfg.MaxAttempts-1 {
+			break
+		}
+		exp := math.Pow(2, float64(i))
+		delay := time.Duration(float64(cfg.BaseDelay) * exp)
+		if delay > cfg.MaxDelay {
+			delay = cfg.MaxDelay
+		}
+		jitter := 0.5 + rand.Float64() // [0.5, 1.5]
+		delay = time.Duration(float64(delay) * jitter)
+		fmt.Fprintf(nil, "") // suppress unused import — real code uses os.Stderr
+		fmt.Printf("[retry] attempt %d failed, waiting %v\\n", i+1, delay.Round(time.Millisecond))
+		time.Sleep(delay)
+	}
+	return lastErr
+}
+
+func main() {
+	cfg := RetryConfig{
+		MaxAttempts: 5,
+		BaseDelay:   100 * time.Millisecond,
+		MaxDelay:    5 * time.Second,
+	}
+
+	attempt := 0
+	err := WithRetry(cfg, func() error {
+		attempt++
+		if attempt < 4 {
+			return errors.New("429 Too Many Requests")
+		}
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println("All attempts failed:", err)
+	} else {
+		fmt.Printf("Succeeded on attempt %d\\n", attempt)
+	}
+}`,
+    checks: [
+      { pattern: /type\s+RetryConfig\s+struct/, msg: "RetryConfig struct defined" },
+      { pattern: /MaxAttempts\s+int/, msg: "MaxAttempts field is int" },
+      { pattern: /BaseDelay\s+time\.Duration/, msg: "BaseDelay is time.Duration" },
+      { pattern: /MaxDelay\s+time\.Duration/, msg: "MaxDelay is time.Duration" },
+      { pattern: /func\s+WithRetry/, msg: "WithRetry function defined" },
+      { pattern: /func\(\)\s+error/, msg: "fn parameter is func() error" },
+      { pattern: /math\.Pow\s*\(\s*2/, msg: "Uses 2^N exponential formula" },
+      { pattern: /MaxDelay|maxDelay/, msg: "MaxDelay cap applied" },
+      { pattern: /rand\.Float64\(\)|rand\.Float32\(\)/, msg: "Random jitter applied" },
+      { pattern: /time\.Sleep/, msg: "Actually sleeps between retries" },
+    ]
+  }
+},
+
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-code-refresh", type: "code", title: "Go: Token Auto-Refresh",
+  challenge: {
+    title: "Implement Automatic Token Refresh",
+    desc: "LWA access tokens expire every 3600 seconds. An AI agent running 24/7 must refresh tokens automatically before they expire — without any human interaction.",
+    requirements: [
+      "Define `TokenManager` struct with: ClientID, ClientSecret, RefreshToken (strings), AccessToken (string), ExpiresAt (time.Time), mu (sync.Mutex)",
+      "Implement `GetValidToken() (string, error)` — returns current AccessToken if still valid (with 60s buffer), otherwise calls refresh",
+      "Implement `refresh() error` — makes a POST to `https://api.amazon.com/auth/o2/token` with grant_type=refresh_token, updates AccessToken and ExpiresAt",
+      "Use sync.Mutex to make GetValidToken safe for concurrent goroutines",
+      "The 60-second buffer prevents using a token that expires mid-request",
+    ],
+    starter: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"strings"
+	"sync"
+	"time"
+)
+
+type tokenResponse struct {
+	AccessToken string \`json:"access_token"\`
+	ExpiresIn   int    \`json:"expires_in"\`
+}
+
+// TODO: Define TokenManager struct
+// Fields: ClientID, ClientSecret, RefreshToken, AccessToken string
+//         ExpiresAt time.Time, mu sync.Mutex
+
+
+// TODO: Implement GetValidToken() (string, error)
+// Check if ExpiresAt - 60s is in the future; if so return AccessToken
+// Otherwise call refresh() first
+
+
+// TODO: Implement refresh() error
+// POST to https://api.amazon.com/auth/o2/token
+// Body: grant_type=refresh_token&client_id=...&client_secret=...&refresh_token=...
+// Parse tokenResponse, update AccessToken and ExpiresAt
+
+
+func main() {
+	tm := &TokenManager{
+		ClientID:     "amzn1.application-oa2-client.abc",
+		ClientSecret: "secret123",
+		RefreshToken: "Atzr|refreshtoken",
+	}
+
+	// Simulate: token already set and not expiring soon
+	tm.AccessToken = "Atza|existingtoken"
+	tm.ExpiresAt = time.Now().Add(10 * time.Minute)
+
+	token, err := tm.GetValidToken()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Got token:", token[:20]+"...")
+}
+`,
+    solution: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"strings"
+	"sync"
+	"time"
+)
+
+type tokenResponse struct {
+	AccessToken string \`json:"access_token"\`
+	ExpiresIn   int    \`json:"expires_in"\`
+}
+
+type TokenManager struct {
+	ClientID     string
+	ClientSecret string
+	RefreshToken string
+	AccessToken  string
+	ExpiresAt    time.Time
+	mu           sync.Mutex
+}
+
+func (tm *TokenManager) GetValidToken() (string, error) {
+	tm.mu.Lock()
+	defer tm.mu.Unlock()
+	if time.Now().Add(60 * time.Second).Before(tm.ExpiresAt) {
+		return tm.AccessToken, nil
+	}
+	if err := tm.refresh(); err != nil {
+		return "", err
+	}
+	return tm.AccessToken, nil
+}
+
+func (tm *TokenManager) refresh() error {
+	data := url.Values{}
+	data.Set("grant_type", "refresh_token")
+	data.Set("client_id", tm.ClientID)
+	data.Set("client_secret", tm.ClientSecret)
+	data.Set("refresh_token", tm.RefreshToken)
+
+	resp, err := http.Post(
+		"https://api.amazon.com/auth/o2/token",
+		"application/x-www-form-urlencoded",
+		strings.NewReader(data.Encode()),
+	)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+
+	var tr tokenResponse
+	if err := json.Unmarshal(body, &tr); err != nil {
+		return err
+	}
+	tm.AccessToken = tr.AccessToken
+	tm.ExpiresAt = time.Now().Add(time.Duration(tr.ExpiresIn) * time.Second)
+	return nil
+}
+
+func main() {
+	tm := &TokenManager{
+		ClientID:     "amzn1.application-oa2-client.abc",
+		ClientSecret: "secret123",
+		RefreshToken: "Atzr|refreshtoken",
+	}
+
+	tm.AccessToken = "Atza|existingtoken"
+	tm.ExpiresAt = time.Now().Add(10 * time.Minute)
+
+	token, err := tm.GetValidToken()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("Got token:", token[:20]+"...")
+}`,
+    checks: [
+      { pattern: /type\s+TokenManager\s+struct/, msg: "TokenManager struct defined" },
+      { pattern: /sync\.Mutex/, msg: "sync.Mutex field for concurrency safety" },
+      { pattern: /ExpiresAt\s+time\.Time/, msg: "ExpiresAt is time.Time" },
+      { pattern: /func.*GetValidToken/, msg: "GetValidToken method defined" },
+      { pattern: /mu\.Lock\(\)/, msg: "Mutex Lock called" },
+      { pattern: /defer.*mu\.Unlock\(\)/, msg: "Mutex Unlock deferred" },
+      { pattern: /60\s*\*\s*time\.Second|time\.Minute/, msg: "60-second expiry buffer applied" },
+      { pattern: /func.*refresh\(\)\s+error/, msg: "refresh() method defined" },
+      { pattern: /grant_type.*refresh_token|refresh_token.*grant_type/, msg: "grant_type=refresh_token in request" },
+      { pattern: /api\.amazon\.com\/auth\/o2\/token/, msg: "Correct LWA token endpoint" },
+    ]
+  }
+},
+
+{
+  module: "Module 3 — Amazon Ads API",
+  id: "m3-api-quiz", type: "quiz", title: "Quiz — API",
+  questions: [
+    {
+      q: "Which header tells the Amazon Ads API which advertiser account you're acting on behalf of?",
+      opts: ["Authorization", "Amazon-Advertising-API-ClientId", "Amazon-Advertising-API-Scope", "X-Amzn-Profile-ID"],
+      ans: 2,
+      exp: "Amazon-Advertising-API-Scope contains the Profile ID (numeric), which identifies the specific advertiser account."
+    },
+    {
+      q: "An access token from LWA expires in 3600 seconds. How should your app handle expiration?",
+      opts: [
+        "Ask the user to re-authenticate each hour",
+        "Use the refresh_token to get a new access_token without user interaction",
+        "Store the client_secret and replay the initial auth flow automatically",
+        "Access tokens never expire, only refresh tokens do"
+      ],
+      ans: 1,
+      exp: "The refresh_token is long-lived and can be exchanged for a new access_token via a server-side call (grant_type=refresh_token), no user interaction required."
+    },
+    {
+      q: "The Reports API returns HTTP 200 immediately after you POST a report request. What does this mean?",
+      opts: [
+        "The report data is in the response body",
+        "The report is queued — you must poll GET /reporting/reports/{id} for completion",
+        "An error occurred but Amazon returns 200 anyway",
+        "The report will be emailed to you"
+      ],
+      ans: 1,
+      exp: "Amazon's Reports API is async. The 200 on POST means the request was accepted. You poll until status=COMPLETED, then download from the presigned URL."
+    },
+    {
+      q: "You get HTTP 429 from the Amazon Ads API. What should your code do?",
+      opts: [
+        "Retry immediately in a tight loop",
+        "Stop all requests permanently",
+        "Wait, then retry with exponential backoff — check the Retry-After header",
+        "Switch to a different endpoint"
+      ],
+      ans: 2,
+      exp: "429 = rate limited. Check the Retry-After header for the server's suggested wait time, then retry with exponential backoff + jitter to avoid thundering herd."
+    }
+  ]
+},
+
+// ══════════ MODULE 4: MCP Server ══════════
+{
+  module: "Module 4 — Amazon Ads MCP Server",
+  id: "m4-mcp-overview", type: "read", title: "What is MCP?",
+  content: () => `
+  <div class="read-section">
+    <h2>Model Context Protocol (MCP)</h2>
+    <p class="tagline">📖 Reading · ~5 min</p>
+    <div class="card">
+      <h3>The Problem MCP Solves</h3>
+      <p>AI assistants like Claude are powerful, but they live in isolation — they can't directly call your APIs, read your databases, or take actions in external systems. <strong>MCP (Model Context Protocol)</strong> is an open standard (created by Anthropic) that bridges this gap.</p>
+      <div class="callout info">💡 Think of MCP as a "plugin protocol" — it defines a standard way for any AI to discover and call external tools, regardless of what those tools do.</div>
+    </div>
+    <div class="card">
+      <h3>MCP Architecture</h3>
+      <pre>┌─────────────┐     JSON-RPC 2.0      ┌──────────────────┐
+│  MCP Client │ ◄──────────────────► │   MCP Server     │
+│  (Claude,   │                       │  (your code /    │
+│   Claude    │                       │  3rd-party tool) │
+│   Code, etc)│                       │                  │
+└─────────────┘                       │  - Tools         │
+                                      │  - Resources     │
+                                      │  - Prompts       │
+                                      └──────────────────┘</pre>
+      <p>Communication uses <strong>JSON-RPC 2.0</strong> over either:</p>
+      <ul>
+        <li><strong>stdio</strong>: Server spawned as a child process (most common for local tools)</li>
+        <li><strong>SSE (HTTP)</strong>: Remote server over HTTP with Server-Sent Events</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>MCP Primitives</h3>
+      <table>
+        <tr><th>Primitive</th><th>Purpose</th><th>Example</th></tr>
+        <tr><td><strong>Tools</strong></td><td>Functions the AI can call (with side effects)</td><td><code>create_campaign</code>, <code>update_bid</code></td></tr>
+        <tr><td><strong>Resources</strong></td><td>Data the AI can read (no side effects)</td><td><code>campaigns://list</code>, <code>reports://summary</code></td></tr>
+        <tr><td><strong>Prompts</strong></td><td>Reusable prompt templates</td><td>"Analyze this campaign performance"</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>MCP Tool Definition (JSON Schema)</h3>
+      <pre>{
+  <span class="str">"name"</span>: <span class="str">"get_campaign"</span>,
+  <span class="str">"description"</span>: <span class="str">"Retrieve a Sponsored Products campaign by ID"</span>,
+  <span class="str">"inputSchema"</span>: {
+    <span class="str">"type"</span>: <span class="str">"object"</span>,
+    <span class="str">"properties"</span>: {
+      <span class="str">"campaignId"</span>: {
+        <span class="str">"type"</span>: <span class="str">"integer"</span>,
+        <span class="str">"description"</span>: <span class="str">"The numeric campaign ID"</span>
+      },
+      <span class="str">"profileId"</span>: {
+        <span class="str">"type"</span>: <span class="str">"string"</span>,
+        <span class="str">"description"</span>: <span class="str">"The advertiser profile ID"</span>
+      }
+    },
+    <span class="str">"required"</span>: [<span class="str">"campaignId"</span>, <span class="str">"profileId"</span>]
+  }
+}</pre>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 4 — Amazon Ads MCP Server",
+  id: "m4-mcp-amazon", type: "read", title: "Amazon Ads MCP Server",
+  content: () => `
+  <div class="read-section">
+    <h2>Amazon Ads MCP Server</h2>
+    <p class="tagline">📖 Reading · ~5 min</p>
+    <div class="card">
+      <h3>What It Is</h3>
+      <p>The <strong>Amazon Ads MCP Server</strong> is an official (or community) MCP server that wraps the Amazon Advertising API, exposing its capabilities as MCP tools. This lets Claude (or any MCP client) directly manage Amazon ad campaigns through natural language.</p>
+      <div class="callout tip">✅ Instead of writing custom API integration code, you configure the MCP server once and Claude can then manage campaigns, pull reports, adjust bids — all through conversation.</div>
+    </div>
+    <div class="card">
+      <h3>Key MCP Tools Exposed</h3>
+      <table>
+        <tr><th>Tool Name</th><th>What It Does</th></tr>
+        <tr><td><code>list_profiles</code></td><td>Returns all accessible advertiser profiles</td></tr>
+        <tr><td><code>list_campaigns</code></td><td>Lists campaigns for a profile with optional filters</td></tr>
+        <tr><td><code>get_campaign</code></td><td>Fetches a single campaign by ID</td></tr>
+        <tr><td><code>create_campaign</code></td><td>Creates a new SP/SB/SD campaign</td></tr>
+        <tr><td><code>update_campaign</code></td><td>Modifies budget, state, or bidding strategy</td></tr>
+        <tr><td><code>list_keywords</code></td><td>Lists keywords in an ad group</td></tr>
+        <tr><td><code>create_keywords</code></td><td>Adds new keywords with bids and match types</td></tr>
+        <tr><td><code>update_keyword_bid</code></td><td>Changes bid for specific keywords</td></tr>
+        <tr><td><code>request_report</code></td><td>Initiates an async report request</td></tr>
+        <tr><td><code>get_report_status</code></td><td>Polls report completion</td></tr>
+        <tr><td><code>download_report</code></td><td>Fetches and parses completed report data</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>MCP Server Configuration (claude_desktop_config.json)</h3>
+      <pre>{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"amazon-ads"</span>: {
+      <span class="str">"command"</span>: <span class="str">"npx"</span>,
+      <span class="str">"args"</span>: [<span class="str">"@amazon-ads/mcp-server"</span>],
+      <span class="str">"env"</span>: {
+        <span class="str">"AMAZON_ADS_CLIENT_ID"</span>: <span class="str">"amzn1.application-oa2-client.xxx"</span>,
+        <span class="str">"AMAZON_ADS_CLIENT_SECRET"</span>: <span class="str">"your_secret"</span>,
+        <span class="str">"AMAZON_ADS_REFRESH_TOKEN"</span>: <span class="str">"Atzr|your_refresh_token"</span>,
+        <span class="str">"AMAZON_ADS_PROFILE_ID"</span>: <span class="str">"1234567890"</span>
+      }
+    }
+  }
+}</pre>
+    </div>
+    <div class="card">
+      <h3>How a Tool Call Flows</h3>
+      <ol>
+        <li>You ask Claude: <em>"Pause all campaigns with ACOS over 40%"</em></li>
+        <li>Claude calls <code>list_campaigns</code> → MCP Server → Amazon Ads API</li>
+        <li>Claude receives campaign list with metrics</li>
+        <li>Claude identifies campaigns matching the condition</li>
+        <li>Claude calls <code>update_campaign</code> for each with <code>state: "paused"</code></li>
+        <li>Claude reports back what it did</li>
+      </ol>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 4 — Amazon Ads MCP Server",
+  id: "m4-code3", type: "code", title: "Go: MCP Tool Struct",
+  challenge: {
+    title: "Model an MCP Tool Definition in Go",
+    desc: "MCP tools are described by a JSON schema. Build the Go structs to represent an MCP tool definition, then construct a realistic Amazon Ads tool.",
+    requirements: [
+      "Define `MCPProperty` struct with: Type, Description (string) and Enum ([]string) — with JSON tags",
+      "Define `MCPInputSchema` struct with: Type (string), Properties (map[string]MCPProperty), Required ([]string)",
+      "Define `MCPTool` struct with: Name, Description (string), InputSchema (MCPInputSchema)",
+      "Instantiate a complete `MCPTool` for `update_keyword_bid` that accepts keywordId (integer), bid (number), and profileId (string) — all required"
+    ],
+    starter: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+// TODO: Define MCPProperty struct
+// Fields: Type, Description string; Enum []string
+// JSON tags: "type", "description", "enum,omitempty"
+
+
+// TODO: Define MCPInputSchema struct
+// Fields: Type string, Properties map[string]MCPProperty, Required []string
+// JSON tags: "type", "properties", "required"
+
+
+// TODO: Define MCPTool struct
+// Fields: Name, Description string, InputSchema MCPInputSchema
+// JSON tags: "name", "description", "inputSchema"
+
+
+func main() {
+	// TODO: Create the update_keyword_bid tool
+	// Description: "Update the bid for a specific keyword"
+	// Properties: keywordId (integer), bid (number), profileId (string)
+	// All three are required
+
+	tool := MCPTool{} // fill this in
+
+	data, _ := json.MarshalIndent(tool, "", "  ")
+	fmt.Println(string(data))
+}
+`,
+    solution: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type MCPProperty struct {
+	Type        string   \`json:"type"\`
+	Description string   \`json:"description"\`
+	Enum        []string \`json:"enum,omitempty"\`
+}
+
+type MCPInputSchema struct {
+	Type       string                 \`json:"type"\`
+	Properties map[string]MCPProperty \`json:"properties"\`
+	Required   []string               \`json:"required"\`
+}
+
+type MCPTool struct {
+	Name        string         \`json:"name"\`
+	Description string         \`json:"description"\`
+	InputSchema MCPInputSchema \`json:"inputSchema"\`
+}
+
+func main() {
+	tool := MCPTool{
+		Name:        "update_keyword_bid",
+		Description: "Update the bid for a specific keyword",
+		InputSchema: MCPInputSchema{
+			Type: "object",
+			Properties: map[string]MCPProperty{
+				"keywordId": {
+					Type:        "integer",
+					Description: "The numeric keyword ID to update",
+				},
+				"bid": {
+					Type:        "number",
+					Description: "The new CPC bid amount in the account currency",
+				},
+				"profileId": {
+					Type:        "string",
+					Description: "The advertiser profile ID",
+				},
+			},
+			Required: []string{"keywordId", "bid", "profileId"},
+		},
+	}
+
+	data, _ := json.MarshalIndent(tool, "", "  ")
+	fmt.Println(string(data))
+}`,
+    checks: [
+      { pattern: /type\s+MCPProperty\s+struct/, msg: "MCPProperty struct defined" },
+      { pattern: /omitempty/, msg: "Enum field has omitempty" },
+      { pattern: /type\s+MCPInputSchema\s+struct/, msg: "MCPInputSchema struct defined" },
+      { pattern: /map\[string\]MCPProperty/, msg: "Properties is map[string]MCPProperty" },
+      { pattern: /type\s+MCPTool\s+struct/, msg: "MCPTool struct defined" },
+      { pattern: /update_keyword_bid/, msg: "Tool name is update_keyword_bid" },
+      { pattern: /integer/, msg: "keywordId uses type integer" },
+      { pattern: /number/, msg: "bid uses type number" },
+      { pattern: /Required.*\[/, msg: "Required field is populated" },
+    ]
+  }
+},
+
+{
+  module: "Module 4 — Amazon Ads MCP Server",
+  id: "m4-mcp-quiz", type: "quiz", title: "Quiz — MCP",
+  questions: [
+    {
+      q: "What transport protocols does MCP use for client-server communication?",
+      opts: [
+        "gRPC and REST",
+        "WebSockets and GraphQL",
+        "stdio (child process) and SSE over HTTP",
+        "AMQP and MQTT"
+      ],
+      ans: 2,
+      exp: "MCP uses stdio (the server is spawned as a child process) for local tools, and SSE (Server-Sent Events) over HTTP for remote servers. Both use JSON-RPC 2.0 messages."
+    },
+    {
+      q: "What is the difference between an MCP Tool and an MCP Resource?",
+      opts: [
+        "Tools are for reading data; Resources are for writing data",
+        "Tools can have side effects (actions); Resources are read-only data",
+        "Tools use REST; Resources use GraphQL",
+        "There is no difference — they are aliases"
+      ],
+      ans: 1,
+      exp: "MCP Tools are for actions with possible side effects (creating campaigns, updating bids). Resources are for read-only data access (listing campaigns, reading reports)."
+    },
+    {
+      q: "In the MCP tool input schema, what JSON Schema type would you use for a CPC bid amount like 1.25?",
+      opts: ["string", "integer", "number", "float"],
+      ans: 2,
+      exp: "JSON Schema uses 'number' for all numeric values (including decimals). 'integer' is for whole numbers only. 'float' is not a valid JSON Schema type."
+    },
+    {
+      q: "Claude receives an ask: 'Pause all campaigns with ACOS > 40%'. In what ORDER does it call MCP tools?",
+      opts: [
+        "update_campaign first, then list_campaigns to verify",
+        "list_campaigns to get metrics, identify matching ones, then update_campaign for each",
+        "request_report, then update_campaign after the report completes",
+        "It can do this in a single tool call"
+      ],
+      ans: 1,
+      exp: "Claude must first READ (list_campaigns with metrics) to identify which campaigns meet the condition, then WRITE (update_campaign) for each matching campaign. Read → Reason → Write."
+    }
+  ]
+},
+
+// ══════════ MODULE 5: Advanced & Practical ══════════
+{
+  module: "Module 5 — Advanced Practical",
+  id: "m5-optimization", type: "read", title: "Bid Optimization Strategies",
+  content: () => `
+  <div class="read-section">
+    <h2>Bid Optimization Strategies</h2>
+    <p class="tagline">📖 Reading · ~5 min</p>
+    <div class="card">
+      <h3>The Target ACOS Framework</h3>
+      <p>Every bid optimization decision stems from your target ACOS (TACoS). Here's how to calculate the correct bid:</p>
+      <pre>Max CPC Bid = Price × Conversion Rate × Target ACOS
+
+Example:
+  Product Price:       $29.99
+  Conversion Rate:     12% (0.12)
+  Target ACOS:         25% (0.25)
+
+  Max Bid = $29.99 × 0.12 × 0.25 = $0.90</pre>
+      <div class="callout info">💡 If you don't know your conversion rate yet, use 10–15% as a starting point for most categories, then refine after collecting data.</div>
+    </div>
+    <div class="card">
+      <h3>Keyword Bid Adjustment Formula</h3>
+      <p>When adjusting existing bids based on performance data:</p>
+      <pre>New Bid = Current Bid × (Target ACOS ÷ Actual ACOS)
+
+Example:
+  Current Bid:   $1.50
+  Target ACOS:   25%
+  Actual ACOS:   40%
+
+  New Bid = $1.50 × (0.25 ÷ 0.40) = $1.50 × 0.625 = $0.94</pre>
+      <p style="margin-top:10px">This formula proportionally adjusts bids to trend toward target ACOS. Cap adjustments to ±30% per cycle to avoid overcorrection.</p>
+    </div>
+    <div class="card">
+      <h3>Dayparting & Placement Modifiers</h3>
+      <ul>
+        <li><strong>Top of Search modifier</strong>: +0% to +900%. Most competitive, highest CVR. Start at +50–100%.</li>
+        <li><strong>Product Pages modifier</strong>: Usually lower CVR than search. Start neutral (0%).</li>
+        <li><strong>Dayparting</strong>: Available via API only (not console). Schedule rules to raise/lower bids by hour of day or day of week.</li>
+      </ul>
+      <div class="callout warn">⚠️ Placement modifiers stack multiplicatively with dynamic bidding. A $1.00 bid with +100% ToS modifier and Dynamic Up+Down can become $4.00 at Top of Search. Monitor CPCs carefully.</div>
+    </div>
+    <div class="card">
+      <h3>Portfolio Budget Rules</h3>
+      <p>Portfolios let you set a shared budget cap across campaigns, preventing runaway spend:</p>
+      <ul>
+        <li>Monthly spend cap shared across all campaigns in the portfolio</li>
+        <li>When cap is hit, all campaigns in portfolio pause for the rest of the period</li>
+        <li>Useful for agency clients with fixed monthly budgets</li>
+      </ul>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 5 — Advanced Practical",
+  id: "m5-code4", type: "code", title: "Go: Bid Optimizer Function",
+  challenge: {
+    title: "Implement a Bid Optimizer",
+    desc: "Write a Go function that takes current keyword performance data and calculates optimized bids using the Target ACOS formula.",
+    requirements: [
+      "Define a `KeywordPerf` struct with: KeywordID (int64), CurrentBid, ActualACOS, Spend, Revenue (all float64)",
+      "Define a `BidRecommendation` struct with: KeywordID (int64), CurrentBid, RecommendedBid, ChangePercent (float64), Action (string)",
+      "Implement `OptimizeBid(kw KeywordPerf, targetACOS float64) BidRecommendation`",
+      "If ActualACOS is 0 (no sales data), set Action to 'HOLD' and keep current bid",
+      "Cap bid changes at ±30% (clamp new bid to [currentBid*0.70, currentBid*1.30])",
+      "Set Action to 'INCREASE', 'DECREASE', or 'HOLD' based on change direction",
+    ],
+    starter: `package main
+
+import (
+	"fmt"
+	"math"
+)
+
+// TODO: Define KeywordPerf struct
+
+// TODO: Define BidRecommendation struct
+
+// TODO: Implement OptimizeBid function
+
+func main() {
+	keywords := []KeywordPerf{
+		{KeywordID: 1001, CurrentBid: 1.50, ActualACOS: 0.40, Spend: 120, Revenue: 300},
+		{KeywordID: 1002, CurrentBid: 0.80, ActualACOS: 0.15, Spend: 60, Revenue: 400},
+		{KeywordID: 1003, CurrentBid: 1.20, ActualACOS: 0.00, Spend: 10, Revenue: 0},
+	}
+
+	targetACOS := 0.25
+
+	for _, kw := range keywords {
+		rec := OptimizeBid(kw, targetACOS)
+		fmt.Printf("Keyword %d: $%.2f → $%.2f (%.1f%%) [%s]\\n",
+			rec.KeywordID, rec.CurrentBid, rec.RecommendedBid, rec.ChangePercent, rec.Action)
+	}
+}
+`,
+    solution: `package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type KeywordPerf struct {
+	KeywordID  int64
+	CurrentBid float64
+	ActualACOS float64
+	Spend      float64
+	Revenue    float64
+}
+
+type BidRecommendation struct {
+	KeywordID      int64
+	CurrentBid     float64
+	RecommendedBid float64
+	ChangePercent  float64
+	Action         string
+}
+
+func OptimizeBid(kw KeywordPerf, targetACOS float64) BidRecommendation {
+	if kw.ActualACOS == 0 {
+		return BidRecommendation{
+			KeywordID:      kw.KeywordID,
+			CurrentBid:     kw.CurrentBid,
+			RecommendedBid: kw.CurrentBid,
+			ChangePercent:  0,
+			Action:         "HOLD",
+		}
+	}
+
+	rawBid := kw.CurrentBid * (targetACOS / kw.ActualACOS)
+
+	// Cap at ±30%
+	minBid := kw.CurrentBid * 0.70
+	maxBid := kw.CurrentBid * 1.30
+	newBid := math.Min(math.Max(rawBid, minBid), maxBid)
+	newBid = math.Round(newBid*100) / 100
+
+	changePct := ((newBid - kw.CurrentBid) / kw.CurrentBid) * 100
+
+	action := "HOLD"
+	if newBid > kw.CurrentBid+0.001 {
+		action = "INCREASE"
+	} else if newBid < kw.CurrentBid-0.001 {
+		action = "DECREASE"
+	}
+
+	return BidRecommendation{
+		KeywordID:      kw.KeywordID,
+		CurrentBid:     kw.CurrentBid,
+		RecommendedBid: newBid,
+		ChangePercent:  changePct,
+		Action:         action,
+	}
+}
+
+func main() {
+	keywords := []KeywordPerf{
+		{KeywordID: 1001, CurrentBid: 1.50, ActualACOS: 0.40, Spend: 120, Revenue: 300},
+		{KeywordID: 1002, CurrentBid: 0.80, ActualACOS: 0.15, Spend: 60, Revenue: 400},
+		{KeywordID: 1003, CurrentBid: 1.20, ActualACOS: 0.00, Spend: 10, Revenue: 0},
+	}
+
+	targetACOS := 0.25
+
+	for _, kw := range keywords {
+		rec := OptimizeBid(kw, targetACOS)
+		fmt.Printf("Keyword %d: $%.2f → $%.2f (%.1f%%) [%s]\\n",
+			rec.KeywordID, rec.CurrentBid, rec.RecommendedBid, rec.ChangePercent, rec.Action)
+	}
+}`,
+    checks: [
+      { pattern: /type\s+KeywordPerf\s+struct/, msg: "KeywordPerf struct defined" },
+      { pattern: /type\s+BidRecommendation\s+struct/, msg: "BidRecommendation struct defined" },
+      { pattern: /func\s+OptimizeBid/, msg: "OptimizeBid function defined" },
+      { pattern: /ActualACOS\s*==\s*0/, msg: "Handles zero ACOS (no data) case" },
+      { pattern: /HOLD/, msg: "HOLD action returned for no-data case" },
+      { pattern: /0\.70|0\.7[^0-9]/, msg: "Lower cap at 70% of current bid" },
+      { pattern: /1\.30|1\.3[^0-9]/, msg: "Upper cap at 130% of current bid" },
+      { pattern: /INCREASE/, msg: "INCREASE action for bid going up" },
+      { pattern: /DECREASE/, msg: "DECREASE action for bid going down" },
+    ]
+  }
+},
+
+{
+  module: "Module 5 — Advanced Practical",
+  id: "m5-final-quiz", type: "quiz", title: "Final Quiz — Advanced",
+  questions: [
+    {
+      q: "Your keyword has Current Bid = $2.00, Target ACOS = 20%, Actual ACOS = 40%. What is the raw calculated new bid (before capping)?",
+      opts: ["$1.60", "$1.00", "$2.40", "$0.80"],
+      ans: 1,
+      exp: "New Bid = $2.00 × (0.20 ÷ 0.40) = $2.00 × 0.50 = $1.00. After applying the ±30% cap, the minimum is $2.00 × 0.70 = $1.40, so the final bid would be capped at $1.40."
+    },
+    {
+      q: "A campaign uses Dynamic Up+Down bidding with a $1.00 keyword bid and a +100% Top of Search placement modifier. What is the maximum Amazon could charge at Top of Search?",
+      opts: ["$1.00", "$2.00", "$4.00", "$19.00"],
+      ans: 2,
+      exp: "$1.00 base × (1 + 100% ToS modifier) = $2.00. Dynamic Up can multiply up to 2x further = $4.00. The modifiers stack multiplicatively."
+    },
+    {
+      q: "Which of these is the correct sequence for the Amazon Reports API?",
+      opts: [
+        "GET report data → POST request → receive data",
+        "POST request → poll GET status → GET download URL → download",
+        "POST request → WebSocket push → receive data",
+        "GET report → POST filter → PUT result"
+      ],
+      ans: 1,
+      exp: "Amazon Ads Reports API is async: POST to create → poll GET until COMPLETED → download from presigned URL in the response."
+    },
+    {
+      q: "In a portfolio budget setup, what happens when the portfolio's monthly spend cap is reached?",
+      opts: [
+        "Only the highest-spending campaign pauses",
+        "All campaigns in the portfolio pause until the next month",
+        "Amazon automatically increases the cap",
+        "Bids are reduced by 50% across all campaigns"
+      ],
+      ans: 1,
+      exp: "When a portfolio cap is hit, ALL campaigns in that portfolio pause for the remainder of the budget period (month). This is useful for hard budget enforcement."
+    }
+  ]
+}
+
+,
+
+// ══════════ MODULE 6: Amazon Marketing Cloud ══════════
+{
+  module: "Module 6 — Amazon Marketing Cloud (AMC)",
+  id: "m6-amc-overview", type: "read", title: "What is AMC?",
+  content: () => `
+  <div class="read-section">
+    <h2>Amazon Marketing Cloud (AMC)</h2>
+    <p class="tagline">📖 Reading · ~6 min</p>
+    <div class="card">
+      <h3>The Problem AMC Solves</h3>
+      <p>Standard Amazon Ads reports are <strong>siloed per ad type</strong> — your Sponsored Products report doesn't know about your DSP impressions, and neither knows about your Sponsored TV views. A customer might see all three before buying, but you'd attribute the sale to the last click only.</p>
+      <p style="margin-top:10px"><strong>Amazon Marketing Cloud (AMC)</strong> is Amazon's privacy-safe <strong>clean room</strong> — a SQL environment where you can query de-identified, event-level data across ALL Amazon Ads touchpoints in a single query.</p>
+      <div class="callout info">💡 AMC is the only place you can do true <strong>multi-touch attribution</strong>, <strong>path-to-purchase analysis</strong>, and <strong>audience overlap analysis</strong> across Amazon's ad ecosystem. Every serious AI agent for Amazon Ads needs AMC.</div>
+    </div>
+    <div class="card">
+      <h3>How AMC Works</h3>
+      <pre>Your AMC Instance (private)
+├── Amazon-provided tables (event-level, de-identified)
+│   ├── impressions        — every ad impression across SP, SB, SD, DSP, STV
+│   ├── clicks             — click events with timestamps
+│   ├── purchases          — order events (Amazon first-party)
+│   └── streaming_views    — CTV/audio engagement events
+└── Your uploaded tables (optional)
+    ├── CRM data           — customer lists you bring
+    └── Offline conversions — in-store purchases, call conversions
+
+You write SQL → AMC runs it in the clean room → Returns aggregated results
+(Individual-level data never leaves Amazon — only aggregated results return)</pre>
+    </div>
+    <div class="card">
+      <h3>Key AMC Capabilities</h3>
+      <table>
+        <tr><th>Use Case</th><th>What You Learn</th></tr>
+        <tr><td>Multi-touch attribution</td><td>Which ad touchpoints contributed to a purchase, in what order</td></tr>
+        <tr><td>Path-to-purchase</td><td>Average days/touchpoints from first impression to conversion</td></tr>
+        <tr><td>Audience overlap</td><td>% of your DSP audience who also saw your Sponsored Products</td></tr>
+        <tr><td>Frequency analysis</td><td>Optimal ad exposure frequency — where CVR peaks before diminishing</td></tr>
+        <tr><td>New vs. returning</td><td>NTB analysis across ALL channels combined, not per-campaign</td></tr>
+        <tr><td>Custom audiences</td><td>Build audiences from SQL query results → push to DSP for targeting</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>AMC Access & Pricing</h3>
+      <ul>
+        <li>Available to brands spending on <strong>Amazon DSP</strong> (managed or self-serve)</li>
+        <li>Access via <strong>AMC Console</strong> (UI) or <strong>AMC API</strong> (programmatic)</li>
+        <li>AMC itself is <strong>free</strong> — data storage costs are minimal; you pay for the DSP spend that enables access</li>
+        <li>Data latency: typically <strong>24–48 hours</strong> for most tables</li>
+        <li>Lookback window: up to <strong>13 months</strong> of historical data</li>
+      </ul>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 6 — Amazon Marketing Cloud (AMC)",
+  id: "m6-amc-sql", type: "read", title: "AMC SQL Queries & Audiences",
+  content: () => `
+  <div class="read-section">
+    <h2>AMC SQL Queries & Audience Building</h2>
+    <p class="tagline">📖 Reading · ~7 min</p>
+    <div class="card">
+      <h3>AMC SQL Basics</h3>
+      <p>AMC uses standard SQL (Presto/Trino dialect) with some restrictions for privacy (no <code>SELECT *</code>, minimum aggregation thresholds). Key tables:</p>
+      <pre><span class="cm">-- Core AMC tables</span>
+impressions          <span class="cm">-- ad_id, user_id (hashed), timestamp, ad_type, placement</span>
+clicks               <span class="cm">-- ad_id, user_id (hashed), timestamp, campaign_id</span>
+purchases            <span class="cm">-- user_id (hashed), order_id, asin, revenue, timestamp</span>
+dsp_campaigns        <span class="cm">-- DSP campaign metadata</span>
+sp_campaigns         <span class="cm">-- SP campaign metadata</span>
+streaming_views      <span class="cm">-- CTV completion events, quartile (25/50/75/100%)</span></pre>
+    </div>
+    <div class="card">
+      <h3>Query 1: Multi-Touch Path to Purchase</h3>
+      <pre><span class="cm">-- What sequence of ad touchpoints leads to conversion?</span>
+<span class="kw">SELECT</span>
+  STRING_AGG(ad_type, <span class="str">' → '</span> <span class="kw">ORDER BY</span> event_timestamp) <span class="kw">AS</span> path,
+  COUNT(DISTINCT user_id) <span class="kw">AS</span> converters,
+  SUM(revenue) <span class="kw">AS</span> total_revenue
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span> i.user_id, i.ad_type, i.event_timestamp
+  <span class="kw">FROM</span> impressions i
+  <span class="kw">INNER JOIN</span> purchases p <span class="kw">ON</span> i.user_id = p.user_id
+  <span class="kw">WHERE</span> i.event_timestamp <span class="kw">BETWEEN</span> p.purchase_timestamp - INTERVAL <span class="str">'14'</span> DAY
+    <span class="kw">AND</span> p.purchase_timestamp
+)
+<span class="kw">GROUP BY</span> path
+<span class="kw">ORDER BY</span> converters <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="nm">20</span></pre>
+    </div>
+    <div class="card">
+      <h3>Query 2: Frequency vs. Conversion Rate</h3>
+      <pre><span class="cm">-- Find the optimal ad frequency (where CVR peaks)</span>
+<span class="kw">SELECT</span>
+  impression_count <span class="kw">AS</span> frequency,
+  COUNT(DISTINCT user_id) <span class="kw">AS</span> users,
+  COUNT(DISTINCT <span class="kw">CASE</span> <span class="kw">WHEN</span> purchased = <span class="nm">1</span> <span class="kw">THEN</span> user_id <span class="kw">END</span>) <span class="kw">AS</span> buyers,
+  ROUND(
+    <span class="nm">100.0</span> * COUNT(DISTINCT <span class="kw">CASE</span> <span class="kw">WHEN</span> purchased = <span class="nm">1</span> <span class="kw">THEN</span> user_id <span class="kw">END</span>)
+    / COUNT(DISTINCT user_id), <span class="nm">2</span>
+  ) <span class="kw">AS</span> cvr_pct
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span>
+    i.user_id,
+    COUNT(*) <span class="kw">AS</span> impression_count,
+    MAX(<span class="kw">CASE</span> <span class="kw">WHEN</span> p.user_id <span class="kw">IS NOT NULL</span> <span class="kw">THEN</span> <span class="nm">1</span> <span class="kw">ELSE</span> <span class="nm">0</span> <span class="kw">END</span>) <span class="kw">AS</span> purchased
+  <span class="kw">FROM</span> impressions i
+  <span class="kw">LEFT JOIN</span> purchases p <span class="kw">ON</span> i.user_id = p.user_id
+    <span class="kw">AND</span> p.purchase_timestamp > i.event_timestamp
+  <span class="kw">WHERE</span> i.ad_type = <span class="str">'DSP'</span>
+  <span class="kw">GROUP BY</span> i.user_id
+)
+<span class="kw">GROUP BY</span> frequency
+<span class="kw">ORDER BY</span> frequency</pre>
+    </div>
+    <div class="card">
+      <h3>Query 3: Build a Custom Audience</h3>
+      <pre><span class="cm">-- Create audience: viewed CTV ad but didn't purchase in 30 days</span>
+<span class="kw">SELECT</span> DISTINCT sv.user_id
+<span class="kw">FROM</span> streaming_views sv
+<span class="kw">LEFT JOIN</span> purchases p
+  <span class="kw">ON</span> sv.user_id = p.user_id
+  <span class="kw">AND</span> p.purchase_timestamp > sv.event_timestamp
+  <span class="kw">AND</span> p.purchase_timestamp < sv.event_timestamp + INTERVAL <span class="str">'30'</span> DAY
+<span class="kw">WHERE</span> sv.completion_quartile = <span class="nm">4</span>   <span class="cm">-- watched 100% of the ad</span>
+  <span class="kw">AND</span> sv.event_timestamp > CURRENT_DATE - INTERVAL <span class="str">'30'</span> DAY
+  <span class="kw">AND</span> p.user_id <span class="kw">IS NULL</span>            <span class="cm">-- did NOT purchase</span>
+
+<span class="cm">-- This result set becomes a DSP audience segment you can retarget</span></pre>
+      <div class="callout tip">✅ AMC audiences created from SQL can be pushed directly to Amazon DSP for targeting. This closes the loop: <em>CTV impression → non-converter identified in AMC → retargeted via DSP display</em>.</div>
+    </div>
+    <div class="card">
+      <h3>AMC API Flow (for AI Agents)</h3>
+      <pre><span class="cm">// 1. Submit a query</span>
+<span class="kw">POST</span> https://marketing-stream.amazon.com/amc/query/execute
+{
+  <span class="str">"queryText"</span>: <span class="str">"SELECT ... FROM impressions ..."</span>,
+  <span class="str">"queryParameters"</span>: {},
+  <span class="str">"timeWindowStart"</span>: <span class="str">"2024-01-01"</span>,
+  <span class="str">"timeWindowEnd"</span>: <span class="str">"2024-01-31"</span>
+}
+<span class="cm">// Returns: { "queryExecutionId": "qe-abc123" }</span>
+
+<span class="cm">// 2. Poll status</span>
+<span class="kw">GET</span> /amc/query/{queryExecutionId}
+<span class="cm">// status: "RUNNING" | "SUCCESS" | "FAILED"</span>
+
+<span class="cm">// 3. Download results from S3</span>
+<span class="cm">// On SUCCESS: response contains S3 output location</span></pre>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 6 — Amazon Marketing Cloud (AMC)",
+  id: "m6-amc-quiz", type: "quiz", title: "Quiz — AMC",
+  questions: [
+    {
+      q: "Why is Amazon Marketing Cloud called a 'clean room'?",
+      opts: [
+        "It stores only clean, validated ad data without duplicates",
+        "It's a privacy-safe environment where you can query de-identified data — individual records never leave Amazon",
+        "It automatically cleans up old campaign data",
+        "It removes bot traffic from impression data"
+      ],
+      ans: 1,
+      exp: "A clean room is a privacy-preserving environment where multiple parties can analyze combined data without exposing individual-level records. Amazon de-identifies users with hashed IDs; only aggregated results are returned to you."
+    },
+    {
+      q: "Which of these insights is ONLY possible in AMC, not in standard Amazon Ads reporting?",
+      opts: [
+        "ACOS for a specific keyword",
+        "Impressions for a DSP campaign",
+        "Which sequence of ad touchpoints across SP, DSP, and CTV led to a purchase",
+        "CTR for a Sponsored Products ad group"
+      ],
+      ans: 2,
+      exp: "Multi-touch path-to-purchase across ad types (SP + DSP + CTV in one analysis) is only possible in AMC. Standard reports are siloed per ad type and don't share a common user identifier."
+    },
+    {
+      q: "What does a completion_quartile = 4 mean in AMC's streaming_views table?",
+      opts: [
+        "The viewer watched the first 25% of the ad",
+        "The ad was shown on 4 different devices",
+        "The viewer watched 100% of the streaming TV ad",
+        "The campaign has 4 streaming creatives"
+      ],
+      ans: 2,
+      exp: "Video completion is tracked in quartiles: 1=25%, 2=50%, 3=75%, 4=100%. A quartile=4 event means the viewer watched the entire ad — the most engaged segment for retargeting."
+    },
+    {
+      q: "What can you do with an audience you build from an AMC SQL query?",
+      opts: [
+        "Automatically pause Sponsored Products campaigns",
+        "Push it to Amazon DSP as a targetable audience segment",
+        "Use it as a keyword bid modifier in Sponsored Products",
+        "Share it directly with Google Ads"
+      ],
+      ans: 1,
+      exp: "AMC audiences can be pushed to Amazon DSP for use as targeting segments. This enables the full loop: analyze behavior in AMC → build audience → retarget via DSP display or streaming TV ads."
+    }
+  ]
+},
+
+// ══════════ MODULE 7: Building Your AI Agent ══════════
+{
+  module: "Module 7 — Building Your AI Agent",
+  id: "m7-architecture", type: "read", title: "AI Agent Architecture",
+  content: () => `
+  <div class="read-section">
+    <h2>AI Agent Architecture for Amazon Ads</h2>
+    <p class="tagline">📖 Reading · ~7 min</p>
+    <div class="card">
+      <h3>The Core Agent Loop</h3>
+      <p>An AI agent for Amazon Ads is fundamentally a <strong>sense → reason → act</strong> loop running on a schedule:</p>
+      <pre>┌─────────────────────────────────────────────────────────┐
+│                    AGENT LOOP (every N hours)            │
+│                                                         │
+│  1. SENSE    Pull metrics via Reports API               │
+│              Pull AMC query results                     │
+│              Pull bid recommendations                   │
+│              ↓                                          │
+│  2. REASON   Compare actuals vs. targets (ACOS, budget) │
+│              Identify keywords to raise/lower/pause     │
+│              Identify campaigns hitting budget cap      │
+│              LLM call: generate action plan with        │
+│              reasoning (for audit log)                  │
+│              ↓                                          │
+│  3. ACT      Batch update keyword bids (≤1000/req)      │
+│              Update campaign budgets                    │
+│              Pause/enable campaigns                     │
+│              Create budget rules for future events      │
+│              ↓                                          │
+│  4. LOG      Record every change with before/after      │
+│              values + reasoning to database             │
+│              Send summary to Slack/email                │
+└─────────────────────────────────────────────────────────┘</pre>
+    </div>
+    <div class="card">
+      <h3>What the LLM Does in the Loop</h3>
+      <p>The LLM (Claude/GPT) is NOT making raw API calls — it's the <strong>reasoning layer</strong> that interprets data and generates a structured action plan. Your Go code executes the plan.</p>
+      <table>
+        <tr><th>Component</th><th>Role</th><th>Technology</th></tr>
+        <tr><td>Scheduler</td><td>Triggers the loop on cron</td><td>Go cron, AWS Lambda, etc.</td></tr>
+        <tr><td>Data fetcher</td><td>Pulls reports, polls completion</td><td>Go + Amazon Ads API</td></tr>
+        <tr><td>AMC analyzer</td><td>Runs SQL, fetches results</td><td>Go + AMC API</td></tr>
+        <tr><td>LLM reasoner</td><td>Interprets data, generates action JSON</td><td>Claude API / GPT-4</td></tr>
+        <tr><td>Action executor</td><td>Validates + executes batch updates</td><td>Go + Amazon Ads API</td></tr>
+        <tr><td>Audit logger</td><td>Records all changes with reasoning</td><td>PostgreSQL / DynamoDB</td></tr>
+        <tr><td>MCP server (optional)</td><td>Exposes agent tools to Claude UI</td><td>Go MCP server</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Structured LLM Prompt Pattern</h3>
+      <p>For reliable agent actions, prompt the LLM to return structured JSON, not prose:</p>
+      <pre><span class="str">You are an Amazon Ads optimization agent.
+
+Current performance data:
+{metrics_json}
+
+Targets:
+- ACOS target: 25%
+- Daily budget utilization target: 85-95%
+
+Return a JSON action plan:
+{
+  "reasoning": "...",
+  "actions": [
+    {
+      "type": "UPDATE_KEYWORD_BID",
+      "keywordId": "111",
+      "currentBid": 1.50,
+      "newBid": 0.94,
+      "reason": "ACOS 40% > target 25%, reducing bid by 37%"
+    },
+    {
+      "type": "UPDATE_CAMPAIGN_BUDGET",
+      "campaignId": "999",
+      "currentBudget": 50.00,
+      "newBudget": 75.00,
+      "reason": "Campaign hitting budget cap at 2pm, losing impressions"
+    }
+  ]
+}</span></pre>
+    </div>
+    <div class="card">
+      <h3>Safety Rails — Critical for Production</h3>
+      <ul>
+        <li><strong>Max change per cycle</strong>: Cap bid changes at ±30%, budget changes at ±50%</li>
+        <li><strong>Minimum data threshold</strong>: Don't act on &lt;100 clicks or &lt;7 days of data</li>
+        <li><strong>Human-in-the-loop option</strong>: For changes above a dollar threshold, send for approval before executing</li>
+        <li><strong>Dry-run mode</strong>: Log what the agent <em>would</em> do without making API calls — run for a week before going live</li>
+        <li><strong>Circuit breaker</strong>: If spend increases &gt;X% in a day unexpectedly, pause all campaigns and alert</li>
+        <li><strong>Audit log</strong>: Every API write is logged with timestamp, before/after values, and the LLM's reasoning</li>
+      </ul>
+    </div>
+  </div>`
+},
+
+{
+  module: "Module 7 — Building Your AI Agent",
+  id: "m7-code-agent", type: "code", title: "Go: Agent Feedback Loop",
+  challenge: {
+    title: "Build the Agent's Core Feedback Loop",
+    desc: "Wire together the pieces you've built: metrics fetching, bid optimization, and batch API updates into a single agent cycle function.",
+    requirements: [
+      "Define `AgentConfig` struct with: TargetACOS, MaxBidChangePct, MinClicks (floats/int), DryRun (bool)",
+      "Define `MetricRow` struct with: KeywordID (string), CurrentBid, ActualACOS, Clicks (float64)",
+      "Define `BidAction` struct with: KeywordID (string), OldBid, NewBid (float64), Reason (string)",
+      "Implement `RunCycle(cfg AgentConfig, metrics []MetricRow) ([]BidAction, error)`",
+      "Skip keywords with Clicks < MinClicks (insufficient data)",
+      "Calculate newBid = currentBid × (TargetACOS / ActualACOS), cap change at ±MaxBidChangePct",
+      "If DryRun is true, log actions but return them without 'executing' (just return the slice)",
+      "Include a Reason string on each BidAction explaining why the change was made",
+    ],
+    starter: `package main
+
+import (
+	"fmt"
+	"math"
+)
+
+// TODO: Define AgentConfig struct
+
+// TODO: Define MetricRow struct
+
+// TODO: Define BidAction struct
+
+// TODO: Implement RunCycle(cfg AgentConfig, metrics []MetricRow) ([]BidAction, error)
+
+func main() {
+	cfg := AgentConfig{
+		TargetACOS:     0.25,
+		MaxBidChangePct: 0.30,
+		MinClicks:      50,
+		DryRun:         true,
+	}
+
+	metrics := []MetricRow{
+		{KeywordID: "kw-001", CurrentBid: 1.50, ActualACOS: 0.42, Clicks: 120},
+		{KeywordID: "kw-002", CurrentBid: 0.80, ActualACOS: 0.14, Clicks: 200},
+		{KeywordID: "kw-003", CurrentBid: 1.20, ActualACOS: 0.26, Clicks: 30},  // skip: low clicks
+		{KeywordID: "kw-004", CurrentBid: 2.00, ActualACOS: 0.00, Clicks: 80},  // skip: no sales data
+	}
+
+	actions, err := RunCycle(cfg, metrics)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Printf("[DRY RUN] %d actions planned:\\n", len(actions))
+	for _, a := range actions {
+		fmt.Printf("  %s: $%.2f → $%.2f | %s\\n", a.KeywordID, a.OldBid, a.NewBid, a.Reason)
+	}
+}
+`,
+    solution: `package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type AgentConfig struct {
+	TargetACOS      float64
+	MaxBidChangePct float64
+	MinClicks       float64
+	DryRun          bool
+}
+
+type MetricRow struct {
+	KeywordID  string
+	CurrentBid float64
+	ActualACOS float64
+	Clicks     float64
+}
+
+type BidAction struct {
+	KeywordID string
+	OldBid    float64
+	NewBid    float64
+	Reason    string
+}
+
+func RunCycle(cfg AgentConfig, metrics []MetricRow) ([]BidAction, error) {
+	var actions []BidAction
+
+	for _, m := range metrics {
+		if m.Clicks < cfg.MinClicks {
+			continue // insufficient data
+		}
+		if m.ActualACOS == 0 {
+			continue // no sales — hold bid
+		}
+
+		rawBid := m.CurrentBid * (cfg.TargetACOS / m.ActualACOS)
+		maxUp := m.CurrentBid * (1 + cfg.MaxBidChangePct)
+		maxDown := m.CurrentBid * (1 - cfg.MaxBidChangePct)
+		newBid := math.Min(math.Max(rawBid, maxDown), maxUp)
+		newBid = math.Round(newBid*100) / 100
+
+		if math.Abs(newBid-m.CurrentBid) < 0.01 {
+			continue // no meaningful change
+		}
+
+		direction := "INCREASE"
+		if newBid < m.CurrentBid {
+			direction = "DECREASE"
+		}
+		reason := fmt.Sprintf("%s bid: ACOS %.0f%% vs target %.0f%%",
+			direction, m.ActualACOS*100, cfg.TargetACOS*100)
+
+		actions = append(actions, BidAction{
+			KeywordID: m.KeywordID,
+			OldBid:    m.CurrentBid,
+			NewBid:    newBid,
+			Reason:    reason,
+		})
+	}
+
+	if cfg.DryRun {
+		fmt.Printf("[DRY RUN] Would execute %d bid changes\\n", len(actions))
+	}
+	return actions, nil
+}
+
+func main() {
+	cfg := AgentConfig{
+		TargetACOS:      0.25,
+		MaxBidChangePct: 0.30,
+		MinClicks:       50,
+		DryRun:          true,
+	}
+
+	metrics := []MetricRow{
+		{KeywordID: "kw-001", CurrentBid: 1.50, ActualACOS: 0.42, Clicks: 120},
+		{KeywordID: "kw-002", CurrentBid: 0.80, ActualACOS: 0.14, Clicks: 200},
+		{KeywordID: "kw-003", CurrentBid: 1.20, ActualACOS: 0.26, Clicks: 30},
+		{KeywordID: "kw-004", CurrentBid: 2.00, ActualACOS: 0.00, Clicks: 80},
+	}
+
+	actions, err := RunCycle(cfg, metrics)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Printf("[DRY RUN] %d actions planned:\\n", len(actions))
+	for _, a := range actions {
+		fmt.Printf("  %s: $%.2f → $%.2f | %s\\n", a.KeywordID, a.OldBid, a.NewBid, a.Reason)
+	}
+}`,
+    checks: [
+      { pattern: /type\s+AgentConfig\s+struct/, msg: "AgentConfig struct defined" },
+      { pattern: /DryRun\s+bool/, msg: "DryRun bool field present" },
+      { pattern: /type\s+MetricRow\s+struct/, msg: "MetricRow struct defined" },
+      { pattern: /type\s+BidAction\s+struct/, msg: "BidAction struct defined" },
+      { pattern: /Reason\s+string/, msg: "BidAction has Reason string" },
+      { pattern: /func\s+RunCycle/, msg: "RunCycle function defined" },
+      { pattern: /MinClicks|minClicks/, msg: "MinClicks threshold check" },
+      { pattern: /ActualACOS\s*==\s*0|actualACOS\s*==\s*0/, msg: "Zero ACOS (no sales) handled" },
+      { pattern: /MaxBidChangePct|maxBidChangePct/, msg: "MaxBidChangePct cap applied" },
+      { pattern: /DryRun|dryRun/, msg: "DryRun mode respected" },
+    ]
+  }
+},
+
+{
+  module: "Module 7 — Building Your AI Agent",
+  id: "m7-capstone-quiz", type: "quiz", title: "Capstone Quiz — AI Agent",
+  questions: [
+    {
+      q: "Your AI agent calls the Recommendations API and gets suggestedBid = $1.15. Your own Target ACOS formula gives $0.94. What is a good hybrid approach?",
+      opts: [
+        "Always use Amazon's suggestion — they know better",
+        "Always use your formula — external signals add noise",
+        "Blend them: e.g., 60% your formula + 40% Amazon suggestion, then cap at ±30%",
+        "Use whichever is lower to minimize spend"
+      ],
+      ans: 2,
+      exp: "Blending signals is best practice. Amazon's bid recommendations use impression-level auction data you can't see. Your formula uses your actual ACOS targets. A weighted blend captures both signals. Always apply the ±30% cap per cycle to prevent volatility."
+    },
+    {
+      q: "Why should an AI agent have a 'dry-run' mode before going live?",
+      opts: [
+        "Amazon requires a dry-run period before API access is granted",
+        "To validate the agent's logic and catch bugs without making real bid/budget changes that cost money",
+        "Dry-run is required for the Recommendations API",
+        "It reduces API rate limiting"
+      ],
+      ans: 1,
+      exp: "A dry-run logs what the agent WOULD do without executing API writes. Running in dry-run for 1–2 weeks lets you validate the logic catches bad edge cases (zero ACOS, low-data keywords, budget spikes) before it controls real spend."
+    },
+    {
+      q: "In AMC, you build an audience of users who watched 100% of your CTV ad but didn't purchase in 30 days. Where do you USE this audience?",
+      opts: [
+        "As a keyword bid modifier in Sponsored Products",
+        "As a negative keyword list",
+        "Push to Amazon DSP to retarget them with display or CTV ads",
+        "Upload to Sponsored Brands video targeting"
+      ],
+      ans: 2,
+      exp: "AMC custom audiences are pushed to Amazon DSP as targetable segments. The pattern is: identify high-intent non-converters in AMC → retarget via DSP with a stronger offer or different creative."
+    },
+    {
+      q: "Your agent finds a keyword with 30 clicks and ACOS of 85%. Should it immediately cut the bid?",
+      opts: [
+        "Yes — 85% ACOS is way above target, cut immediately",
+        "No — 30 clicks is below the minimum data threshold; hold the bid",
+        "Pause the keyword entirely",
+        "Double the bid to get more data faster"
+      ],
+      ans: 1,
+      exp: "30 clicks is statistically insufficient — a few orders could swing ACOS from 85% to 20%. Wait until MinClicks (typically 50–100) before making bid decisions. Acting on low data leads to thrashing."
+    },
+    {
+      q: "You have 10,000 keywords to update. The SP API v3 allows 1,000 per batch PUT request. How many API calls do you need?",
+      opts: ["1", "10", "100", "10,000"],
+      ans: 1,
+      exp: "10,000 ÷ 1,000 per batch = 10 API calls. This is why bulk operations are critical for agent scale — without batching you'd need 10,000 individual calls at severely rate-limited speed."
+    }
+  ]
+}
+
+,
+
+// ─── MODULE 8: Claude API for AI Agents ───────────────────────────────────
+
+{
+  module: "Module 8 — Claude API for AI Agents",
+  id: "m8-read1", type: "read",
+  title: "Claude API Overview — Models, Auth & Messages",
+  content: () => `
+<h2>Claude API Overview</h2>
+<p>The Claude API from Anthropic is how you give your Amazon Ads AI agent a brain. Instead of hard-coding rules, Claude reasons about the data you send it and decides what actions to take.</p>
+
+<h3>Base URL &amp; Auth</h3>
+<pre>POST https://api.anthropic.com/v1/messages
+Headers:
+  x-api-key: YOUR_API_KEY
+  anthropic-version: 2023-06-01
+  content-type: application/json</pre>
+<p>Your API key comes from <strong>console.anthropic.com</strong>. Store it in an environment variable (<code>ANTHROPIC_API_KEY</code>), never in code.</p>
+
+<h3>Choosing a Model</h3>
+<table>
+<tr><th>Model ID</th><th>Best for</th><th>Context</th></tr>
+<tr><td><code>claude-opus-4-8</code></td><td>Complex reasoning, multi-step agent decisions</td><td>1M tokens</td></tr>
+<tr><td><code>claude-sonnet-4-6</code></td><td>Balanced speed + quality, report analysis</td><td>1M tokens</td></tr>
+<tr><td><code>claude-haiku-4-5</code></td><td>Fast, cheap classification tasks</td><td>200K tokens</td></tr>
+</table>
+<p>For an Amazon Ads agent making bid decisions, use <strong>claude-opus-4-8</strong> — the reasoning quality directly affects your ad spend.</p>
+
+<h3>Adaptive Thinking</h3>
+<p>Opus 4.8 supports <strong>adaptive thinking</strong>, which lets Claude reason through problems before answering. Enable it for bid strategy decisions:</p>
+<pre>// In your JSON body:
+"thinking": {"type": "adaptive"}</pre>
+<p>With adaptive thinking on, Claude may emit a <code>thinking</code> block before the final answer block. Your code should skip <code>thinking</code> blocks and read only <code>text</code> or <code>tool_use</code> blocks.</p>
+
+<h3>A Minimal Messages Request</h3>
+<pre>POST /v1/messages
+{
+  "model": "claude-opus-4-8",
+  "max_tokens": 1024,
+  "thinking": {"type": "adaptive"},
+  "messages": [
+    {
+      "role": "user",
+      "content": "My keyword 'running shoes' has ACOS 42%, target is 25%, 120 clicks. Should I adjust the bid?"
+    }
+  ]
+}</pre>
+
+<h3>Response Structure</h3>
+<pre>{
+  "id": "msg_01...",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {"type": "thinking", "thinking": "...Claude's reasoning..."},
+    {"type": "text", "text": "Yes, reduce the bid by ~17%..."}
+  ],
+  "stop_reason": "end_turn",
+  "usage": {"input_tokens": 45, "output_tokens": 120}
+}</pre>
+<p>Always check <code>stop_reason</code> — if it's <code>"tool_use"</code> you need to execute tools before continuing (covered in the next lesson).</p>
+
+<h3>System Prompt for Amazon Ads Agent</h3>
+<p>Use the top-level <code>system</code> field (not inside messages) to set the agent's role:</p>
+<pre>{
+  "model": "claude-opus-4-8",
+  "max_tokens": 1024,
+  "system": "You are an Amazon Ads optimization agent. Your goal is to achieve target ACOS while maximizing revenue. Never change a bid by more than 30% per cycle.",
+  "messages": [{"role": "user", "content": "Analyze the following keyword metrics..."}]
+}</pre>
+
+<h3>Rate Limits &amp; Costs</h3>
+<ul>
+<li>Tier 1 (new accounts): ~50 requests/min, 40K tokens/min</li>
+<li>Opus 4.8: $5 per 1M input tokens, $25 per 1M output tokens</li>
+<li>An agent cycle analyzing 100 keywords might use ~5K tokens ≈ $0.025/cycle</li>
+<li>Running every hour: ~$18/month — trivial compared to ad spend saved</li>
+</ul>
+`
+},
+
+{
+  module: "Module 8 — Claude API for AI Agents",
+  id: "m8-read2", type: "read",
+  title: "Tool Use — Defining Tools for Amazon Ads Actions",
+  content: () => `
+<h2>Tool Use: Giving Claude the Ability to Act</h2>
+<p>Tool use (also called "function calling") is the pattern that turns Claude from a chatbot into an agent. You define tools with JSON schemas, Claude decides which to call, and your Go code executes them against the Amazon Ads API.</p>
+
+<h3>The Tool Use Loop</h3>
+<pre>1. You send Claude a prompt + list of available tools
+2. Claude responds with stop_reason: "tool_use" + a tool_use block
+3. Your code executes the tool (calls Amazon Ads API)
+4. You send the result back as role:"user" with type:"tool_result"
+5. Claude responds with the final answer (stop_reason: "end_turn")</pre>
+
+<h3>Defining a Tool in JSON</h3>
+<pre>{
+  "name": "update_keyword_bid",
+  "description": "Updates the bid for a Sponsored Products keyword. Only call when clicks >= 50 and ACOS deviation > 5%.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "keyword_id": {"type": "string", "description": "The Amazon Ads keyword ID"},
+      "new_bid":    {"type": "number", "description": "New bid in USD, e.g. 0.85"},
+      "reason":     {"type": "string", "description": "Explanation for the bid change"}
+    },
+    "required": ["keyword_id", "new_bid", "reason"]
+  }
+}</pre>
+
+<h3>Amazon Ads Agent Tool Kit</h3>
+<table>
+<tr><th>Tool Name</th><th>Purpose</th></tr>
+<tr><td>get_keyword_metrics</td><td>Fetches clicks, spend, sales, ACOS for a keyword</td></tr>
+<tr><td>update_keyword_bid</td><td>Changes bid via SP API v3 PUT /keywords</td></tr>
+<tr><td>pause_keyword</td><td>Sets keyword state to PAUSED</td></tr>
+<tr><td>request_report</td><td>Triggers a Sponsored Products report download</td></tr>
+<tr><td>get_recommendations</td><td>Calls the Recommendations API for bid suggestions</td></tr>
+</table>
+
+<h3>The tool_use Response Block</h3>
+<pre>{
+  "type": "tool_use",
+  "id": "toolu_01ABC...",
+  "name": "update_keyword_bid",
+  "input": {
+    "keyword_id": "KW123456",
+    "new_bid": 0.72,
+    "reason": "ACOS 41% vs 25% target with 120 clicks; reducing bid 17%"
+  }
+}</pre>
+<p>Save the <code>id</code> — you must return it in your tool_result so Claude knows which call completed.</p>
+
+<h3>Sending a tool_result Back</h3>
+<pre>{
+  "role": "user",
+  "content": [
+    {
+      "type": "tool_result",
+      "tool_use_id": "toolu_01ABC...",
+      "content": "Bid updated successfully. New bid: $0.72"
+    }
+  ]
+}</pre>
+
+<h3>Tool Description Best Practices</h3>
+<ul>
+<li>Tell Claude <em>when</em> to call the tool, not just what it does</li>
+<li>Include units in parameter descriptions ("bid in USD, not cents")</li>
+<li>Add guardrails in the description: "Only call if clicks >= 50"</li>
+<li>Claude follows these instructions — they're prompt content</li>
+</ul>
+
+<h3>Tool Choice Control</h3>
+<pre>"tool_choice": {"type": "auto"}      // Claude decides (default)
+"tool_choice": {"type": "any"}       // Claude must call at least one tool
+"tool_choice": {"type": "tool", "name": "get_keyword_metrics"}  // force specific tool</pre>
+`
+},
+
+{
+  module: "Module 8 — Claude API for AI Agents",
+  id: "m8-code1", type: "code",
+  title: "Go: Claude API HTTP Client",
+  challenge: {
+    title: "Build a Claude API client in Go using net/http",
+    desc: `Write a Go program that calls the Claude API POST /v1/messages using raw net/http. The program should:
+1. Define structs for the request body (ClaudeRequest, Message, ThinkingConfig) and response (ClaudeResponse, ContentBlock)
+2. Build a POST request with the required headers
+3. Unmarshal the JSON response and print the text content blocks`,
+    requirements: [
+      "Define ClaudeRequest struct with json tags",
+      "Define Message struct with Role and Content fields",
+      "Define ClaudeResponse struct with Content array and StopReason",
+      "Define ContentBlock struct with Type and Text fields",
+      "Set x-api-key, anthropic-version, and content-type headers",
+      "Use json.Marshal to encode the request body",
+      "Use json.Unmarshal to decode the response",
+      "Loop over response Content blocks to find type == \"text\"",
+    ],
+    starter: `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+// TODO: Define ThinkingConfig struct with Type string (json:"type")
+
+// TODO: Define Message struct with Role string and Content string
+
+// TODO: Define ClaudeRequest struct with:
+//   Model      string         (json:"model")
+//   MaxTokens  int            (json:"max_tokens")
+//   Thinking   ThinkingConfig (json:"thinking")
+//   Messages   []Message      (json:"messages")
+
+// TODO: Define ContentBlock struct with Type and Text string fields
+
+// TODO: Define ClaudeResponse struct with Content []ContentBlock and StopReason string
+
+func main() {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	if apiKey == "" {
+		fmt.Println("Set ANTHROPIC_API_KEY env var")
+		os.Exit(1)
+	}
+
+	// TODO: Build a ClaudeRequest asking:
+	// "My keyword 'wireless earbuds' has ACOS 38%, target 25%, 80 clicks. Should I adjust the bid?"
+	// Use model "claude-opus-4-8", max_tokens 512, thinking type "adaptive"
+
+	// TODO: Marshal the request to JSON bytes with json.Marshal
+
+	// TODO: Create http.NewRequest("POST", "https://api.anthropic.com/v1/messages", body)
+
+	// TODO: Set headers:
+	//   req.Header.Set("x-api-key", apiKey)
+	//   req.Header.Set("anthropic-version", "2023-06-01")
+	//   req.Header.Set("content-type", "application/json")
+
+	// TODO: Execute with http.DefaultClient.Do(req)
+
+	// TODO: Read and unmarshal response body into ClaudeResponse
+
+	// TODO: Loop over resp.Content, find blocks where Type == "text", print block.Text
+
+	fmt.Println("Done")
+}`,
+    solution: `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+type ThinkingConfig struct {
+	Type string \`json:"type"\`
+}
+
+type Message struct {
+	Role    string \`json:"role"\`
+	Content string \`json:"content"\`
+}
+
+type ClaudeRequest struct {
+	Model     string         \`json:"model"\`
+	MaxTokens int            \`json:"max_tokens"\`
+	Thinking  ThinkingConfig \`json:"thinking"\`
+	Messages  []Message      \`json:"messages"\`
+}
+
+type ContentBlock struct {
+	Type string \`json:"type"\`
+	Text string \`json:"text"\`
+}
+
+type ClaudeResponse struct {
+	Content    []ContentBlock \`json:"content"\`
+	StopReason string         \`json:"stop_reason"\`
+}
+
+func main() {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	if apiKey == "" {
+		fmt.Println("Set ANTHROPIC_API_KEY env var")
+		os.Exit(1)
+	}
+
+	reqBody := ClaudeRequest{
+		Model:     "claude-opus-4-8",
+		MaxTokens: 512,
+		Thinking:  ThinkingConfig{Type: "adaptive"},
+		Messages: []Message{
+			{Role: "user", Content: "My keyword 'wireless earbuds' has ACOS 38%, target 25%, 80 clicks. Should I adjust the bid?"},
+		},
+	}
+
+	bodyBytes, _ := json.Marshal(reqBody)
+
+	req, _ := http.NewRequest("POST", "https://api.anthropic.com/v1/messages", bytes.NewReader(bodyBytes))
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("anthropic-version", "2023-06-01")
+	req.Header.Set("content-type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+
+	raw, _ := io.ReadAll(res.Body)
+	var resp ClaudeResponse
+	json.Unmarshal(raw, &resp)
+
+	for _, block := range resp.Content {
+		if block.Type == "text" {
+			fmt.Println(block.Text)
+		}
+	}
+
+	fmt.Println("Done")
+}`,
+    checks: [
+      { pattern: /type\s+ClaudeRequest\s+struct/, msg: "ClaudeRequest struct defined" },
+      { pattern: /type\s+Message\s+struct/, msg: "Message struct defined" },
+      { pattern: /type\s+ClaudeResponse\s+struct/, msg: "ClaudeResponse struct defined" },
+      { pattern: /type\s+ContentBlock\s+struct/, msg: "ContentBlock struct defined" },
+      { pattern: /x-api-key/, msg: "x-api-key header set" },
+      { pattern: /anthropic-version/, msg: "anthropic-version header set" },
+      { pattern: /json\.Marshal/, msg: "json.Marshal used for request" },
+      { pattern: /json\.Unmarshal|json\.NewDecoder/, msg: "Response JSON decoded" },
+      { pattern: /block\.Type\s*==\s*"text"|\.Type\s*==\s*"text"/, msg: "Text blocks filtered from content array" },
+    ]
+  }
+},
+
+{
+  module: "Module 8 — Claude API for AI Agents",
+  id: "m8-code2", type: "code",
+  title: "Go: Implement the Tool Use Loop",
+  challenge: {
+    title: "Build a Go tool-use loop that dispatches Claude tool calls",
+    desc: `Implement the full tool-use agentic loop in Go. Claude decides to call a tool, your code executes it, and you send the result back.
+
+The loop:
+1. Send initial prompt with tools defined
+2. If stop_reason == "tool_use": extract tool_use blocks, dispatch, send tool_result
+3. If stop_reason == "end_turn": print final text and stop`,
+    requirements: [
+      "Define a Tool struct with Name, Description, InputSchema",
+      "Include tools array in the Claude request body",
+      "Check stop_reason == \"tool_use\" after first response",
+      "Extract tool_use blocks from the content array (Type == \"tool_use\")",
+      "Build tool_result messages using the block's ID as tool_use_id",
+      "Send a second request with original user msg + assistant turn + tool_result turn",
+      "Print text blocks from the final end_turn response",
+      "Implement dispatchTool function that switches on tool name",
+    ],
+    starter: `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+// TODO: Define InputSchema struct with Type string and Properties map[string]interface{}
+
+// TODO: Define Tool struct with Name, Description, InputSchema fields
+
+// TODO: Define ContentBlock struct with Type, Text, ID, Name, Input (json.RawMessage)
+
+// TODO: Define ToolResultContent struct with:
+//   Type      string (json:"type")       // "tool_result"
+//   ToolUseID string (json:"tool_use_id")
+//   Content   string (json:"content")
+
+// TODO: Define ClaudeResponse struct with Content []ContentBlock and StopReason string
+
+// callClaude sends a request to Claude and returns raw response bytes
+func callClaude(apiKey string, body interface{}) []byte {
+	// TODO: Marshal body, POST to /v1/messages with correct headers
+	return nil
+}
+
+// dispatchTool simulates executing a tool against the Amazon Ads API
+func dispatchTool(name string, input json.RawMessage) string {
+	// TODO: Switch on name:
+	//   "get_keyword_metrics" -> return JSON: {"keyword":"wireless earbuds","clicks":80,"acos":0.38}
+	//   "update_keyword_bid"  -> return "Bid updated successfully"
+	//   default               -> return "Unknown tool"
+	return ""
+}
+
+func main() {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+
+	// TODO: Define metricsToolDef Tool struct (get_keyword_metrics, requires keyword_id)
+	// TODO: Define bidToolDef Tool struct (update_keyword_bid, requires keyword_id and new_bid)
+
+	// TODO: Build userMsg as map with role:"user" and content asking Claude to
+	// check metrics for KW-001 and update bid if ACOS > 30% (target 25%)
+
+	// TODO: Build req1 map with model, max_tokens, tools, messages
+
+	// TODO: Call callClaude, unmarshal into ClaudeResponse
+
+	// TODO: If resp1.StopReason == "tool_use":
+	//   Loop content blocks, find Type == "tool_use"
+	//   Call dispatchTool(block.Name, block.Input)
+	//   Build ToolResultContent with ToolUseID = block.ID
+	//   Build req2 with messages: [userMsg, assistantTurn, toolResultUserTurn]
+	//   Call callClaude again, print text from final response
+
+	fmt.Println("Tool use loop complete")
+}`,
+    solution: `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+type InputSchema struct {
+	Type       string                 \`json:"type"\`
+	Properties map[string]interface{} \`json:"properties"\`
+	Required   []string               \`json:"required"\`
+}
+
+type Tool struct {
+	Name        string      \`json:"name"\`
+	Description string      \`json:"description"\`
+	InputSchema InputSchema \`json:"input_schema"\`
+}
+
+type ContentBlock struct {
+	Type  string          \`json:"type"\`
+	Text  string          \`json:"text,omitempty"\`
+	ID    string          \`json:"id,omitempty"\`
+	Name  string          \`json:"name,omitempty"\`
+	Input json.RawMessage \`json:"input,omitempty"\`
+}
+
+type ToolResultContent struct {
+	Type      string \`json:"type"\`
+	ToolUseID string \`json:"tool_use_id"\`
+	Content   string \`json:"content"\`
+}
+
+type ClaudeResponse struct {
+	Content    []ContentBlock \`json:"content"\`
+	StopReason string         \`json:"stop_reason"\`
+}
+
+func callClaude(apiKey string, body interface{}) []byte {
+	b, _ := json.Marshal(body)
+	req, _ := http.NewRequest("POST", "https://api.anthropic.com/v1/messages", bytes.NewReader(b))
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("anthropic-version", "2023-06-01")
+	req.Header.Set("content-type", "application/json")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+	raw, _ := io.ReadAll(res.Body)
+	return raw
+}
+
+func dispatchTool(name string, input json.RawMessage) string {
+	switch name {
+	case "get_keyword_metrics":
+		return \`{"keyword":"wireless earbuds","clicks":80,"acos":0.38,"spend":64.0,"sales":168.42}\`
+	case "update_keyword_bid":
+		return "Bid updated successfully"
+	default:
+		return "Unknown tool: " + name
+	}
+}
+
+func main() {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+
+	metricsToolDef := Tool{
+		Name:        "get_keyword_metrics",
+		Description: "Fetch clicks, spend, sales, and ACOS for a keyword by ID",
+		InputSchema: InputSchema{
+			Type: "object",
+			Properties: map[string]interface{}{
+				"keyword_id": map[string]string{"type": "string"},
+			},
+			Required: []string{"keyword_id"},
+		},
+	}
+
+	bidToolDef := Tool{
+		Name:        "update_keyword_bid",
+		Description: "Update bid. Only call if ACOS > target and clicks >= 50.",
+		InputSchema: InputSchema{
+			Type: "object",
+			Properties: map[string]interface{}{
+				"keyword_id": map[string]string{"type": "string"},
+				"new_bid":    map[string]string{"type": "number"},
+			},
+			Required: []string{"keyword_id", "new_bid"},
+		},
+	}
+
+	userMsg := map[string]interface{}{
+		"role":    "user",
+		"content": "Check metrics for keyword KW-001 and update the bid if ACOS > 30%. Target ACOS is 25%.",
+	}
+
+	req1 := map[string]interface{}{
+		"model":      "claude-opus-4-8",
+		"max_tokens": 1024,
+		"tools":      []Tool{metricsToolDef, bidToolDef},
+		"messages":   []interface{}{userMsg},
+	}
+
+	raw1 := callClaude(apiKey, req1)
+	var resp1 ClaudeResponse
+	json.Unmarshal(raw1, &resp1)
+
+	if resp1.StopReason == "tool_use" {
+		var toolResults []ToolResultContent
+		for _, block := range resp1.Content {
+			if block.Type == "tool_use" {
+				result := dispatchTool(block.Name, block.Input)
+				toolResults = append(toolResults, ToolResultContent{
+					Type:      "tool_result",
+					ToolUseID: block.ID,
+					Content:   result,
+				})
+			}
+		}
+
+		assistantTurn := map[string]interface{}{
+			"role":    "assistant",
+			"content": resp1.Content,
+		}
+		toolResultTurn := map[string]interface{}{
+			"role":    "user",
+			"content": toolResults,
+		}
+
+		req2 := map[string]interface{}{
+			"model":      "claude-opus-4-8",
+			"max_tokens": 1024,
+			"tools":      []Tool{metricsToolDef, bidToolDef},
+			"messages":   []interface{}{userMsg, assistantTurn, toolResultTurn},
+		}
+
+		raw2 := callClaude(apiKey, req2)
+		var resp2 ClaudeResponse
+		json.Unmarshal(raw2, &resp2)
+
+		for _, block := range resp2.Content {
+			if block.Type == "text" {
+				fmt.Println(block.Text)
+			}
+		}
+	}
+
+	fmt.Println("Tool use loop complete")
+}`,
+    checks: [
+      { pattern: /type\s+Tool\s+struct/, msg: "Tool struct defined" },
+      { pattern: /json\.RawMessage/, msg: "json.RawMessage used for tool input" },
+      { pattern: /tool_use_id|ToolUseID/, msg: "tool_use_id field present" },
+      { pattern: /StopReason\s*==\s*"tool_use"/, msg: "stop_reason == \"tool_use\" checked" },
+      { pattern: /dispatchTool/, msg: "dispatchTool function implemented" },
+      { pattern: /tool_result/, msg: "tool_result type in response" },
+      { pattern: /callClaude/, msg: "callClaude helper used" },
+      { pattern: /req2|assistantTurn/, msg: "Second request with tool results sent" },
+    ]
+  }
+},
+
+{
+  module: "Module 8 — Claude API for AI Agents",
+  id: "m8-quiz", type: "quiz",
+  title: "Quiz — Claude API Concepts",
+  questions: [
+    {
+      q: "Which HTTP header authenticates your Go program to the Claude API?",
+      opts: ["Authorization: Bearer", "x-api-key", "API-Token", "anthropic-key"],
+      ans: 1,
+      exp: "Claude uses x-api-key (not Authorization: Bearer). You also need anthropic-version: 2023-06-01 and content-type: application/json. All three headers are required on every request."
+    },
+    {
+      q: "Claude responds with stop_reason: \"tool_use\". What must your code do next?",
+      opts: [
+        "Print the response text and exit",
+        "Execute the tool(s) Claude requested and send the result(s) back as a tool_result message",
+        "Resend the original request — tool_use means Claude is still thinking",
+        "Call the next tool in your predefined sequence"
+      ],
+      ans: 1,
+      exp: "stop_reason: \"tool_use\" means Claude is pausing to request your tool execution. You must: (1) find tool_use blocks in content, (2) run each tool, (3) send a new message with role:\"user\" containing type:\"tool_result\" with the matching tool_use_id. Then Claude continues."
+    },
+    {
+      q: "What is adaptive thinking (thinking: {type: \"adaptive\"}) and why use it for bid decisions?",
+      opts: [
+        "It makes Claude respond faster by skipping chain-of-thought",
+        "It lets Claude reason step-by-step internally before answering, improving quality on complex decisions",
+        "It is required for tool use to work",
+        "It streams the response token-by-token"
+      ],
+      ans: 1,
+      exp: "Adaptive thinking enables Claude's extended internal reasoning. For complex multi-variable decisions (ACOS vs target, click volume, bid caps), the reasoning step significantly improves output quality. You'll see a thinking block in the response content — skip it and read the text or tool_use blocks."
+    },
+    {
+      q: "In the tool input_schema, what does the \"required\" array do?",
+      opts: [
+        "Lists tools Claude is required to call",
+        "Specifies which JSON parameters Claude must include when calling that tool",
+        "Forces Claude to call the tool on every request",
+        "Sets the HTTP required headers"
+      ],
+      ans: 1,
+      exp: "required in the input_schema is standard JSON Schema — it tells Claude which parameters it MUST include in the tool call input object. Always include required parameters like keyword_id and new_bid for bid update tools."
+    },
+    {
+      q: "Why store ANTHROPIC_API_KEY in an environment variable rather than hardcoding it?",
+      opts: [
+        "The API won't accept keys sent in code",
+        "Environment variables load faster at runtime",
+        "Hardcoded keys get committed to git and can be leaked; env vars keep secrets out of source code",
+        "Go can only read API keys from environment variables"
+      ],
+      ans: 2,
+      exp: "Hardcoding secrets in source code is a critical security risk — they get committed to git history and can be leaked via public repos, logs, or build artifacts. Environment variables (os.Getenv) keep secrets in the runtime environment, separate from code. Use a secrets manager or .env file (gitignored) in production."
+    }
+  ]
+},
+
+// ─── MODULE 9: Claude + Amazon Ads MCP Integration ────────────────────────
+
+{
+  module: "Module 9 — Claude + Amazon Ads MCP Integration",
+  id: "m9-read1", type: "read",
+  title: "How Claude Uses MCP Tools — The Full Flow",
+  content: () => `
+<h2>MCP: Model Context Protocol</h2>
+<p>MCP is an open protocol from Anthropic that standardizes how AI models connect to external tools and data sources. Instead of custom API glue code for every tool, you build an MCP server once and any MCP-compatible AI can use it.</p>
+
+<h3>The Three-Layer Architecture</h3>
+<pre>┌─────────────────────────────────────────┐
+│  Claude (AI)                            │
+│  Reasons about ads, decides actions     │
+└──────────────┬──────────────────────────┘
+               │ tool_use (Claude API)
+               ▼
+┌─────────────────────────────────────────┐
+│  MCP Client (your Go app)               │
+│  Translates tool_use → MCP JSON-RPC     │
+└──────────────┬──────────────────────────┘
+               │ JSON-RPC 2.0 (stdio or HTTP/SSE)
+               ▼
+┌─────────────────────────────────────────┐
+│  MCP Server (amazon-ads-mcp-server)     │
+│  Exposes Amazon Ads API as MCP tools    │
+└──────────────┬──────────────────────────┘
+               │ HTTPS + OAuth2
+               ▼
+┌─────────────────────────────────────────┐
+│  Amazon Ads API (SP, SB, SD, DSP, AMC) │
+└─────────────────────────────────────────┘</pre>
+
+<h3>MCP JSON-RPC 2.0 Wire Format</h3>
+<pre>// Request (MCP Client → MCP Server)
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "sp_update_keyword_bid",
+    "arguments": {
+      "profileId": "1234567890",
+      "keywordId": "KW-001",
+      "bid": 0.72
+    }
+  }
+}
+
+// Response (MCP Server → MCP Client)
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [
+      {"type": "text", "text": "Keyword KW-001 bid updated to $0.72"}
+    ]
+  }
+}</pre>
+
+<h3>MCP Tool Discovery (tools/list)</h3>
+<p>Before Claude can use MCP tools, your client calls <code>tools/list</code> to discover available tools and passes them to Claude:</p>
+<pre>// Request
+{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}
+
+// Response includes tool definitions with inputSchema
+// Your Go app reads these and passes them in Claude's tools[] array</pre>
+
+<h3>Transport Options</h3>
+<table>
+<tr><th>Transport</th><th>When to use</th><th>How</th></tr>
+<tr><td>stdio</td><td>Local development, MCP server runs as subprocess</td><td>Go app spawns the server process, communicates via stdin/stdout</td></tr>
+<tr><td>HTTP/SSE</td><td>Production, server runs as a separate service</td><td>POST to /messages endpoint, server-sent events for responses</td></tr>
+</table>
+
+<h3>The Full Flow: Claude → MCP → Amazon Ads</h3>
+<pre>1. tools/list: Discover all MCP tools from the server
+2. Pass those tool definitions to Claude in the tools[] array
+3. Claude analyzes metrics, emits tool_use: "sp_update_keyword_bid"
+4. Your Go app translates tool_use input to a tools/call MCP request
+5. MCP server calls Amazon Ads API (SP API v3 PUT /keywords)
+6. MCP server returns the result as MCP JSON-RPC response
+7. Your Go app wraps the result in a tool_result, sends back to Claude
+8. Claude confirms the action and explains its reasoning</pre>
+
+<h3>Amazon Ads MCP Server Tool Examples</h3>
+<table>
+<tr><th>MCP Tool Name</th><th>Amazon Ads API Endpoint</th></tr>
+<tr><td>sp_get_campaigns</td><td>GET /sp/campaigns</td></tr>
+<tr><td>sp_update_keyword_bid</td><td>PUT /sp/keywords</td></tr>
+<tr><td>sp_get_reports</td><td>POST /reporting/reports</td></tr>
+<tr><td>sb_update_budget</td><td>PUT /sb/campaigns</td></tr>
+<tr><td>dsp_get_audiences</td><td>GET /dsp/audiences</td></tr>
+<tr><td>amc_run_query</td><td>POST /amc/reporting/workgroups/{id}/queries</td></tr>
+</table>
+`
+},
+
+{
+  module: "Module 9 — Claude + Amazon Ads MCP Integration",
+  id: "m9-read2", type: "read",
+  title: "Building an MCP Server in Go for Amazon Ads",
+  content: () => `
+<h2>Building a Go MCP Server</h2>
+<p>An MCP server is a process that speaks JSON-RPC 2.0. In Go, you read JSON-RPC requests from stdin (or HTTP), route to handler functions, and write responses to stdout. No framework required — just encoding/json and bufio.</p>
+
+<h3>Core Structs</h3>
+<pre>type JSONRPCRequest struct {
+  JSONRPC string          \`json:"jsonrpc"\`
+  ID      int             \`json:"id"\`
+  Method  string          \`json:"method"\`
+  Params  json.RawMessage \`json:"params"\`
+}
+
+type JSONRPCResponse struct {
+  JSONRPC string      \`json:"jsonrpc"\`
+  ID      int         \`json:"id"\`
+  Result  interface{} \`json:"result,omitempty"\`
+  Error   interface{} \`json:"error,omitempty"\`
+}</pre>
+
+<h3>Main Loop (stdio transport)</h3>
+<pre>func main() {
+  fmt.Fprintln(os.Stderr, "MCP Server started") // log to stderr only
+  scanner := bufio.NewScanner(os.Stdin)
+  for scanner.Scan() {
+    var req JSONRPCRequest
+    json.Unmarshal(scanner.Bytes(), &req)
+
+    var result interface{}
+    switch req.Method {
+    case "tools/list":
+      result = handleToolsList()
+    case "tools/call":
+      result = handleToolsCall(req.Params)
+    }
+
+    resp := JSONRPCResponse{JSONRPC: "2.0", ID: req.ID, Result: result}
+    out, _ := json.Marshal(resp)
+    fmt.Println(string(out)) // stdout = JSON-RPC channel
+  }
+}</pre>
+
+<h3>Implementing tools/list</h3>
+<pre>func handleToolsList() interface{} {
+  return map[string]interface{}{
+    "tools": []map[string]interface{}{
+      {
+        "name": "sp_update_keyword_bid",
+        "description": "Update a Sponsored Products keyword bid",
+        "inputSchema": map[string]interface{}{
+          "type": "object",
+          "properties": map[string]interface{}{
+            "profileId": map[string]string{"type": "string"},
+            "keywordId": map[string]string{"type": "string"},
+            "bid":       map[string]string{"type": "number"},
+          },
+          "required": []string{"profileId", "keywordId", "bid"},
+        },
+      },
+    },
+  }
+}</pre>
+
+<h3>Implementing tools/call</h3>
+<pre>type ToolCallParams struct {
+  Name      string          \`json:"name"\`
+  Arguments json.RawMessage \`json:"arguments"\`
+}
+
+func handleToolsCall(params json.RawMessage) interface{} {
+  var p ToolCallParams
+  json.Unmarshal(params, &p)
+  switch p.Name {
+  case "sp_update_keyword_bid":
+    return updateKeywordBid(p.Arguments)
+  default:
+    return map[string]string{"error": "unknown tool: " + p.Name}
+  }
+}
+
+func updateKeywordBid(args json.RawMessage) interface{} {
+  var a struct {
+    KeywordID string  \`json:"keywordId"\`
+    Bid       float64 \`json:"bid"\`
+  }
+  json.Unmarshal(args, &a)
+  // In production: call Amazon Ads SP API v3 PUT /keywords here
+  return map[string]interface{}{
+    "content": []map[string]string{
+      {"type": "text", "text": fmt.Sprintf("Updated %s bid to $%.2f", a.KeywordID, a.Bid)},
+    },
+  }
+}</pre>
+
+<h3>Key Design Principles</h3>
+<ul>
+<li><strong>Logs go to stderr</strong> — stdout is the JSON-RPC channel; any non-JSON on stdout breaks the protocol</li>
+<li><strong>Auth in the server</strong> — the MCP server holds the Amazon Ads OAuth token; the orchestration layer never sees it</li>
+<li><strong>Stateless tools</strong> — each tools/call is independent; don't rely on in-memory state between calls</li>
+<li><strong>Error in result</strong> — return <code>{"error": "msg"}</code> in the result field so Claude can read and react to failures</li>
+<li><strong>Idempotent writes</strong> — bid updates should be safe to retry; use PUT not POST for updates</li>
+</ul>
+`
+},
+
+{
+  module: "Module 9 — Claude + Amazon Ads MCP Integration",
+  id: "m9-code1", type: "code",
+  title: "Go: Implement an MCP Server with stdio Transport",
+  challenge: {
+    title: "Build a minimal MCP server in Go that handles tools/list and tools/call",
+    desc: `Write a Go MCP server that reads JSON-RPC 2.0 from stdin and writes responses to stdout. It must handle:
+- tools/list: return two tool definitions (sp_get_keyword_metrics, sp_update_keyword_bid)
+- tools/call: dispatch to the right handler and return an MCP content response
+
+Critical: logs must go to stderr, never stdout.`,
+    requirements: [
+      "Define JSONRPCRequest struct with JSONRPC, ID, Method, Params fields",
+      "Define JSONRPCResponse struct with JSONRPC, ID, Result, Error fields",
+      "Use bufio.NewScanner(os.Stdin) to read line-by-line",
+      "Switch on req.Method for tools/list and tools/call",
+      "Return at least two tool definitions in tools/list response",
+      "Define ToolCallParams struct with Name and Arguments (json.RawMessage)",
+      "Dispatch to handler functions based on tool name",
+      "Write JSON-RPC responses to stdout with fmt.Println",
+      "Write any log output to stderr with fmt.Fprintln(os.Stderr, ...)",
+    ],
+    starter: `package main
+
+import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+// TODO: Define JSONRPCRequest struct
+// Fields: JSONRPC, ID, Method, Params (json.RawMessage)
+
+// TODO: Define JSONRPCResponse struct
+// Fields: JSONRPC, ID, Result interface{}, Error interface{}
+
+// TODO: Define ToolCallParams struct
+// Fields: Name string, Arguments json.RawMessage
+
+func handleToolsList() interface{} {
+	// TODO: Return map with "tools" key containing at least:
+	// - sp_get_keyword_metrics: requires profileId, keywordId, startDate, endDate
+	// - sp_update_keyword_bid: requires profileId, keywordId, bid (number)
+	return nil
+}
+
+func handleToolsCall(params json.RawMessage) interface{} {
+	// TODO: Unmarshal params into ToolCallParams
+	// TODO: Switch on p.Name -> call appropriate handler
+	// TODO: Return {"error": "unknown tool"} for unrecognized tools
+	return nil
+}
+
+func updateKeywordBid(args json.RawMessage) interface{} {
+	// TODO: Unmarshal to get keywordId and bid
+	// TODO: Return: {"content": [{"type": "text", "text": "Updated KW-001 bid to $0.72"}]}
+	return nil
+}
+
+func getKeywordMetrics(args json.RawMessage) interface{} {
+	// TODO: Unmarshal to get keywordId
+	// TODO: Return fake metrics as MCP content text
+	return nil
+}
+
+func main() {
+	fmt.Fprintln(os.Stderr, "MCP Server started") // stderr only
+
+	// TODO: bufio.NewScanner(os.Stdin)
+	// TODO: Loop scanner.Scan()
+	//   Unmarshal line into JSONRPCRequest
+	//   Switch req.Method -> handleToolsList or handleToolsCall
+	//   Build JSONRPCResponse{JSONRPC:"2.0", ID: req.ID, Result: result}
+	//   Marshal and fmt.Println to stdout
+}`,
+    solution: `package main
+
+import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+type JSONRPCRequest struct {
+	JSONRPC string          \`json:"jsonrpc"\`
+	ID      int             \`json:"id"\`
+	Method  string          \`json:"method"\`
+	Params  json.RawMessage \`json:"params"\`
+}
+
+type JSONRPCResponse struct {
+	JSONRPC string      \`json:"jsonrpc"\`
+	ID      int         \`json:"id"\`
+	Result  interface{} \`json:"result,omitempty"\`
+	Error   interface{} \`json:"error,omitempty"\`
+}
+
+type ToolCallParams struct {
+	Name      string          \`json:"name"\`
+	Arguments json.RawMessage \`json:"arguments"\`
+}
+
+func handleToolsList() interface{} {
+	return map[string]interface{}{
+		"tools": []map[string]interface{}{
+			{
+				"name":        "sp_get_keyword_metrics",
+				"description": "Get Sponsored Products keyword performance metrics",
+				"inputSchema": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"profileId": map[string]string{"type": "string"},
+						"keywordId": map[string]string{"type": "string"},
+						"startDate": map[string]string{"type": "string"},
+						"endDate":   map[string]string{"type": "string"},
+					},
+					"required": []string{"profileId", "keywordId", "startDate", "endDate"},
+				},
+			},
+			{
+				"name":        "sp_update_keyword_bid",
+				"description": "Update a Sponsored Products keyword bid",
+				"inputSchema": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"profileId": map[string]string{"type": "string"},
+						"keywordId": map[string]string{"type": "string"},
+						"bid":       map[string]string{"type": "number"},
+					},
+					"required": []string{"profileId", "keywordId", "bid"},
+				},
+			},
+		},
+	}
+}
+
+func updateKeywordBid(args json.RawMessage) interface{} {
+	var a struct {
+		ProfileID string  \`json:"profileId"\`
+		KeywordID string  \`json:"keywordId"\`
+		Bid       float64 \`json:"bid"\`
+	}
+	json.Unmarshal(args, &a)
+	return map[string]interface{}{
+		"content": []map[string]string{
+			{"type": "text", "text": fmt.Sprintf("Updated keyword %s bid to $%.2f on profile %s", a.KeywordID, a.Bid, a.ProfileID)},
+		},
+	}
+}
+
+func getKeywordMetrics(args json.RawMessage) interface{} {
+	var a struct {
+		KeywordID string \`json:"keywordId"\`
+	}
+	json.Unmarshal(args, &a)
+	return map[string]interface{}{
+		"content": []map[string]string{
+			{"type": "text", "text": fmt.Sprintf(\`{"keywordId":"%s","clicks":80,"spend":64.0,"sales":168.42,"acos":0.38}\`, a.KeywordID)},
+		},
+	}
+}
+
+func handleToolsCall(params json.RawMessage) interface{} {
+	var p ToolCallParams
+	json.Unmarshal(params, &p)
+	switch p.Name {
+	case "sp_update_keyword_bid":
+		return updateKeywordBid(p.Arguments)
+	case "sp_get_keyword_metrics":
+		return getKeywordMetrics(p.Arguments)
+	default:
+		return map[string]string{"error": "unknown tool: " + p.Name}
+	}
+}
+
+func main() {
+	fmt.Fprintln(os.Stderr, "MCP Server started")
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		var req JSONRPCRequest
+		json.Unmarshal(scanner.Bytes(), &req)
+
+		var result interface{}
+		switch req.Method {
+		case "tools/list":
+			result = handleToolsList()
+		case "tools/call":
+			result = handleToolsCall(req.Params)
+		default:
+			result = map[string]string{"error": "unknown method: " + req.Method}
+		}
+
+		resp := JSONRPCResponse{JSONRPC: "2.0", ID: req.ID, Result: result}
+		out, _ := json.Marshal(resp)
+		fmt.Println(string(out))
+	}
+}`,
+    checks: [
+      { pattern: /type\s+JSONRPCRequest\s+struct/, msg: "JSONRPCRequest struct defined" },
+      { pattern: /type\s+JSONRPCResponse\s+struct/, msg: "JSONRPCResponse struct defined" },
+      { pattern: /bufio\.NewScanner\(os\.Stdin\)/, msg: "bufio.NewScanner(os.Stdin) used" },
+      { pattern: /scanner\.Scan\(\)/, msg: "scanner.Scan() loop present" },
+      { pattern: /tools\/list/, msg: "tools/list method handled" },
+      { pattern: /tools\/call/, msg: "tools/call method handled" },
+      { pattern: /type\s+ToolCallParams\s+struct/, msg: "ToolCallParams struct defined" },
+      { pattern: /fmt\.Println/, msg: "Response written to stdout with fmt.Println" },
+      { pattern: /os\.Stderr/, msg: "Logs written to stderr" },
+    ]
+  }
+},
+
+{
+  module: "Module 9 — Claude + Amazon Ads MCP Integration",
+  id: "m9-code2", type: "code",
+  title: "Go: Full Integration — Claude + MCP + Amazon Ads",
+  challenge: {
+    title: "Orchestrate the full Claude → MCP → Amazon Ads agent loop in Go",
+    desc: `Write a Go program that runs the complete AI agent flow:
+1. Define tool schemas (simulating what tools/list returns)
+2. Send those tools to Claude with a keyword optimization prompt
+3. Claude requests sp_get_keyword_metrics → your MCPClient executes it
+4. Claude sees metrics → requests sp_update_keyword_bid → your MCPClient executes it
+5. Log each tool call with timestamp
+6. Print Claude's final explanation`,
+    requirements: [
+      "Define MCPClient struct with a callTool(name string, args map[string]interface{}) string method",
+      "callTool must switch on tool name and return simulated results",
+      "Define claudeRequest function that POSTs to Claude API with correct headers",
+      "Define availableTools slice with sp_get_keyword_metrics and sp_update_keyword_bid",
+      "Implement an agent loop: call Claude, check stop_reason, dispatch tools, loop back",
+      "Use log.Printf to log each tool call with time.Now().Format(time.RFC3339)",
+      "Build tool_result messages and append to the messages array",
+      "Break the loop when stop_reason == \"end_turn\"",
+    ],
+    starter: `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"time"
+)
+
+type ContentBlock struct {
+	Type  string          \`json:"type"\`
+	Text  string          \`json:"text,omitempty"\`
+	ID    string          \`json:"id,omitempty"\`
+	Name  string          \`json:"name,omitempty"\`
+	Input json.RawMessage \`json:"input,omitempty"\`
+}
+
+// MCPClient simulates an MCP client connected to the Amazon Ads MCP Server
+type MCPClient struct{}
+
+// callTool simulates sending a tools/call JSON-RPC to the MCP server
+func (m *MCPClient) callTool(toolName string, args map[string]interface{}) string {
+	// TODO: Build rpcReq map representing the JSON-RPC tools/call request
+	// (In production this goes to the MCP server via stdin or HTTP)
+
+	// TODO: Switch on toolName:
+	//   "sp_get_keyword_metrics" -> return JSON: {"keywordId": kwId, "clicks":95,"acos":0.41,"spend":87.40,"sales":213.17}
+	//   "sp_update_keyword_bid"  -> return "Bid updated for KW-789 to $X.XX"
+	//   default                  -> return "Unknown tool: " + toolName
+	return ""
+}
+
+// claudeRequest POSTs to Claude API and returns parsed response as map
+func claudeRequest(apiKey string, body map[string]interface{}) map[string]interface{} {
+	// TODO: json.Marshal body
+	// TODO: http.NewRequest POST to https://api.anthropic.com/v1/messages
+	// TODO: Set x-api-key, anthropic-version, content-type headers
+	// TODO: Execute, ReadAll body, Unmarshal to map[string]interface{}, return it
+	return nil
+}
+
+func main() {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	mcp := &MCPClient{}
+
+	// TODO: Define availableTools as []map[string]interface{} with:
+	//   sp_get_keyword_metrics (requires profileId, keywordId, startDate, endDate)
+	//   sp_update_keyword_bid  (requires profileId, keywordId, bid)
+
+	systemPrompt := "You are an Amazon Ads optimization agent. Target ACOS is 25%. Only update bids when clicks >= 50. Explain your reasoning."
+	userContent := "Optimize the bid for keyword KW-789 (profileId: P-001) for date range 2026-06-01 to 2026-06-18"
+
+	// TODO: Build initial messages slice
+
+	// TODO: Agent loop (for {}):
+	//   Call claudeRequest with model, max_tokens, system, tools, messages
+	//   Extract stop_reason and content from response
+	//   If stop_reason == "tool_use":
+	//     For each content block with Type == "tool_use":
+	//       Unmarshal block.Input to map[string]interface{}
+	//       Call mcp.callTool(block.Name, args)
+	//       log.Printf("[%s] Tool: %s | Result: %s", time.Now().Format(time.RFC3339), block.Name, result)
+	//       Build tool_result map with tool_use_id and content
+	//     Append assistant turn + tool_result user turn to messages
+	//   Else (end_turn):
+	//     Print text blocks, break
+
+	_ = mcp
+	_ = time.Now()
+	_ = log.Printf
+	fmt.Println("Agent run complete")
+}`,
+    solution: `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"time"
+)
+
+type ContentBlock struct {
+	Type  string          \`json:"type"\`
+	Text  string          \`json:"text,omitempty"\`
+	ID    string          \`json:"id,omitempty"\`
+	Name  string          \`json:"name,omitempty"\`
+	Input json.RawMessage \`json:"input,omitempty"\`
+}
+
+type MCPClient struct{}
+
+func (m *MCPClient) callTool(toolName string, args map[string]interface{}) string {
+	rpcReq := map[string]interface{}{
+		"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+		"params": map[string]interface{}{"name": toolName, "arguments": args},
+	}
+	_, _ = json.Marshal(rpcReq) // In production: write to MCP server stdin
+
+	switch toolName {
+	case "sp_get_keyword_metrics":
+		kw, _ := args["keywordId"].(string)
+		return fmt.Sprintf(\`{"keywordId":"%s","clicks":95,"spend":87.40,"sales":213.17,"acos":0.41}\`, kw)
+	case "sp_update_keyword_bid":
+		bid, _ := args["bid"].(float64)
+		kw, _ := args["keywordId"].(string)
+		return fmt.Sprintf("Bid updated for %s to $%.2f", kw, bid)
+	default:
+		return "Unknown tool: " + toolName
+	}
+}
+
+func claudeRequest(apiKey string, body map[string]interface{}) map[string]interface{} {
+	b, _ := json.Marshal(body)
+	req, _ := http.NewRequest("POST", "https://api.anthropic.com/v1/messages", bytes.NewReader(b))
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("anthropic-version", "2023-06-01")
+	req.Header.Set("content-type", "application/json")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	raw, _ := io.ReadAll(res.Body)
+	var out map[string]interface{}
+	json.Unmarshal(raw, &out)
+	return out
+}
+
+func main() {
+	apiKey := os.Getenv("ANTHROPIC_API_KEY")
+	mcp := &MCPClient{}
+
+	availableTools := []map[string]interface{}{
+		{
+			"name":        "sp_get_keyword_metrics",
+			"description": "Get keyword performance. Returns clicks, spend, sales, ACOS.",
+			"input_schema": map[string]interface{}{
+				"type": "object",
+				"properties": map[string]interface{}{
+					"profileId": map[string]string{"type": "string"},
+					"keywordId": map[string]string{"type": "string"},
+					"startDate": map[string]string{"type": "string"},
+					"endDate":   map[string]string{"type": "string"},
+				},
+				"required": []string{"profileId", "keywordId", "startDate", "endDate"},
+			},
+		},
+		{
+			"name":        "sp_update_keyword_bid",
+			"description": "Update keyword bid. Only call if clicks >= 50 and ACOS off by > 5%.",
+			"input_schema": map[string]interface{}{
+				"type": "object",
+				"properties": map[string]interface{}{
+					"profileId": map[string]string{"type": "string"},
+					"keywordId": map[string]string{"type": "string"},
+					"bid":       map[string]string{"type": "number"},
+				},
+				"required": []string{"profileId", "keywordId", "bid"},
+			},
+		},
+	}
+
+	systemPrompt := "You are an Amazon Ads optimization agent. Target ACOS is 25%. Only update bids when clicks >= 50. Explain your reasoning."
+	messages := []interface{}{
+		map[string]interface{}{
+			"role":    "user",
+			"content": "Optimize the bid for keyword KW-789 (profileId: P-001) for date range 2026-06-01 to 2026-06-18",
+		},
+	}
+
+	for {
+		resp := claudeRequest(apiKey, map[string]interface{}{
+			"model":      "claude-opus-4-8",
+			"max_tokens": 1024,
+			"system":     systemPrompt,
+			"tools":      availableTools,
+			"messages":   messages,
+		})
+
+		stopReason, _ := resp["stop_reason"].(string)
+		contentRaw, _ := json.Marshal(resp["content"])
+		var content []ContentBlock
+		json.Unmarshal(contentRaw, &content)
+
+		if stopReason == "tool_use" {
+			var toolResults []map[string]interface{}
+			for _, block := range content {
+				if block.Type == "tool_use" {
+					var args map[string]interface{}
+					json.Unmarshal(block.Input, &args)
+					result := mcp.callTool(block.Name, args)
+					log.Printf("[%s] Tool: %s | Result: %s", time.Now().Format(time.RFC3339), block.Name, result)
+					toolResults = append(toolResults, map[string]interface{}{
+						"type":        "tool_result",
+						"tool_use_id": block.ID,
+						"content":     result,
+					})
+				}
+			}
+			messages = append(messages,
+				map[string]interface{}{"role": "assistant", "content": content},
+				map[string]interface{}{"role": "user", "content": toolResults},
+			)
+		} else {
+			for _, block := range content {
+				if block.Type == "text" {
+					fmt.Println(block.Text)
+				}
+			}
+			break
+		}
+	}
+
+	fmt.Println("Agent run complete")
+}`,
+    checks: [
+      { pattern: /type\s+MCPClient\s+struct/, msg: "MCPClient struct defined" },
+      { pattern: /func.*callTool/, msg: "callTool method on MCPClient" },
+      { pattern: /tools\/call/, msg: "JSON-RPC tools/call request constructed" },
+      { pattern: /claudeRequest/, msg: "claudeRequest function defined" },
+      { pattern: /stop_reason.*tool_use|stopReason.*tool_use|"tool_use"/, msg: "stop_reason tool_use loop handled" },
+      { pattern: /log\.Printf/, msg: "Tool calls logged with log.Printf" },
+      { pattern: /time\.Now\(\)\.Format/, msg: "Timestamp included in log" },
+      { pattern: /tool_result/, msg: "tool_result messages built" },
+      { pattern: /for\s*\{/, msg: "Agent loop with for {} implemented" },
+    ]
+  }
+},
+
+{
+  module: "Module 9 — Claude + Amazon Ads MCP Integration",
+  id: "m9-quiz", type: "quiz",
+  title: "Quiz — MCP Integration Concepts",
+  questions: [
+    {
+      q: "What protocol does MCP use for communication between the MCP client and MCP server?",
+      opts: ["REST/HTTP with JWT auth", "GraphQL", "JSON-RPC 2.0", "gRPC with Protocol Buffers"],
+      ans: 2,
+      exp: "MCP uses JSON-RPC 2.0 — a lightweight remote procedure call protocol using JSON. Messages have a jsonrpc field (always \"2.0\"), an id for matching request/response, a method name, and params. This is why your Go server reads line-by-line JSON and responds with JSON."
+    },
+    {
+      q: "In the MCP + Claude flow, which component holds the Amazon Ads OAuth token?",
+      opts: [
+        "Claude stores it in its context window",
+        "The MCP client (your Go orchestration app)",
+        "The MCP server — the client never sees the token",
+        "It is embedded in each tools/call request"
+      ],
+      ans: 2,
+      exp: "The MCP server holds the OAuth credentials. This is a key security benefit: your AI orchestration layer (Claude + MCP client) never sees sensitive API tokens. The MCP server authenticates with Amazon Ads independently. If your orchestration code is compromised, your ad account credentials stay safe."
+    },
+    {
+      q: "Your MCP server needs to log debug information. Where should it write logs?",
+      opts: [
+        "stdout — where the JSON-RPC responses go",
+        "stderr — separate from the JSON-RPC stdout stream",
+        "A log file only, never to any stream",
+        "Into the JSON-RPC response as a log field"
+      ],
+      ans: 1,
+      exp: "On stdio transport, stdout is the JSON-RPC communication channel. Writing anything else to stdout (logs, fmt.Println debug output) corrupts the JSON stream and breaks the protocol. Always write logs to stderr (fmt.Fprintln(os.Stderr, ...) or log.* which defaults to stderr)."
+    },
+    {
+      q: "Why call tools/list before sending tools to Claude?",
+      opts: [
+        "Amazon requires you to list tools before using them",
+        "So your Go code dynamically discovers available MCP tools — no hardcoding required when the server adds new tools",
+        "Claude refuses to accept tools without a prior tools/list call",
+        "tools/list initializes the MCP server connection"
+      ],
+      ans: 1,
+      exp: "tools/list is the MCP discovery mechanism. By calling it at startup, your orchestration code gets current tool definitions (name, description, inputSchema) dynamically. You can update or add tools to the MCP server without changing your orchestration code. It also keeps the tools[] array you send to Claude in sync with what the server can actually execute."
+    },
+    {
+      q: "After Claude emits a tool_use block for sp_update_keyword_bid, your Go code executes the MCP call and gets back 'Bid updated to $0.68'. What must happen next?",
+      opts: [
+        "Start a new Claude conversation from scratch",
+        "Send a new message with role:\"user\" containing a tool_result block with the matching tool_use_id",
+        "Claude automatically continues — no action needed",
+        "Send the result as role:\"assistant\" with type:\"text\""
+      ],
+      ans: 1,
+      exp: "The tool_use loop requires: (1) capture the tool_use block's id, (2) execute the tool, (3) send a new role:\"user\" message with content type:\"tool_result\", the matching tool_use_id, and the result string. Claude uses the tool_use_id to match your result to its request. Only then does it continue reasoning and produce the final end_turn response."
+    }
+  ]
+}
+
+]; // end CURRICULUM
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let current = 0;
+const done = new Set();
+
+function updateProgress() {
+  const pct = Math.round((done.size / CURRICULUM.length) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${done.size} of ${CURRICULUM.length} lessons complete`;
+}
+
+// ─────────────────────────────────────────────
+// SIDEBAR
+// ─────────────────────────────────────────────
+function buildSidebar() {
+  const nav = document.getElementById('lesson-nav');
+  let lastModule = '';
+  CURRICULUM.forEach((lesson, idx) => {
+    if (lesson.module !== lastModule) {
+      lastModule = lesson.module;
+      const g = document.createElement('div'); g.className = 'module-group';
+      const t = document.createElement('div'); t.className = 'module-group-title';
+      t.textContent = lesson.module; g.appendChild(t); nav.appendChild(g);
+    }
+    const btn = document.createElement('button');
+    btn.className = 'lesson-btn';
+    btn.id = 'nav-' + idx;
+    btn.onclick = () => goTo(idx);
+    const typeLabel = { read: 'read', quiz: 'quiz', code: 'code' }[lesson.type];
+    const badgeClass = { read: 'badge-read', quiz: 'badge-quiz', code: 'badge-code' }[lesson.type];
+    btn.innerHTML = `
+      <span class="lesson-icon">${done.has(idx) ? '✓' : (lesson.type === 'quiz' ? '❓' : lesson.type === 'code' ? '⌨' : '📄')}</span>
+      <span>${lesson.title}</span>
+      <span class="lesson-type-badge ${badgeClass}">${typeLabel}</span>`;
+    nav.lastChild.appendChild(btn);
+  });
+}
+
+function refreshSidebar() {
+  CURRICULUM.forEach((_, idx) => {
+    const btn = document.getElementById('nav-' + idx);
+    if (!btn) return;
+    btn.classList.toggle('active', idx === current);
+    btn.classList.toggle('done', done.has(idx));
+    const icon = btn.querySelector('.lesson-icon');
+    const l = CURRICULUM[idx];
+    icon.textContent = done.has(idx) ? '✓' : (l.type === 'quiz' ? '❓' : l.type === 'code' ? '⌨' : '📄');
+  });
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function goTo(idx) {
+  current = idx;
+  render();
+}
+
+function navigate(dir) {
+  const next = current + dir;
+  if (next < 0 || next >= CURRICULUM.length) return;
+  done.add(current);
+  goTo(next);
+  updateProgress();
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function render() {
+  const lesson = CURRICULUM[current];
+  document.getElementById('lesson-title').textContent = lesson.title;
+  document.getElementById('lesson-meta').textContent = lesson.module;
+  document.getElementById('btn-prev').disabled = current === 0;
+  document.getElementById('btn-next').textContent = current === CURRICULUM.length - 1 ? 'Finish ✓' : 'Next →';
+  refreshSidebar();
+
+  const content = document.getElementById('content');
+  if (lesson.type === 'read') renderRead(content, lesson);
+  else if (lesson.type === 'quiz') renderQuiz(content, lesson);
+  else if (lesson.type === 'code') renderCode(content, lesson);
+  content.scrollTop = 0;
+}
+
+// ── READ ──
+function renderRead(container, lesson) {
+  container.innerHTML = lesson.content();
+}
+
+// ── QUIZ ──
+function renderQuiz(container, lesson) {
+  const answered = {};
+  let html = `<div class="quiz-section"><h2>${lesson.title}</h2><p class="tagline">❓ Quiz · ${lesson.questions.length} questions</p>`;
+  lesson.questions.forEach((q, qi) => {
+    html += `<div class="q-block" id="qb-${qi}">
+      <div class="q-num">Question ${qi+1} of ${lesson.questions.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${q.opts.map((o, oi) => `<button class="opt-btn" id="opt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</button>`).join('')}
+      </div>
+      <div class="q-feedback" id="fb-${qi}"></div>
+    </div>`;
+  });
+  html += `<button class="quiz-submit" onclick="submitQuiz(${lesson.questions.length})">Submit Answers</button>`;
+  html += `<div class="quiz-score" id="quiz-score"></div></div>`;
+  container.innerHTML = html;
+
+  window._quizAnswered = {};
+
+  window.selectOpt = (qi, oi) => {
+    if (window._quizAnswered[qi] !== undefined) return;
+    // Clear previous selection for this question
+    lesson.questions[qi].opts.forEach((_, i) => {
+      document.getElementById(`opt-${qi}-${i}`)?.classList.remove('selected');
+    });
+    document.getElementById(`opt-${qi}-${oi}`)?.classList.add('selected');
+    window._quizAnswered[qi] = oi;
+  };
+
+  window.submitQuiz = (total) => {
+    let score = 0;
+    lesson.questions.forEach((q, qi) => {
+      const chosen = window._quizAnswered[qi];
+      const block = document.getElementById(`qb-${qi}`);
+      const fb = document.getElementById(`fb-${qi}`);
+      q.opts.forEach((_, oi) => {
+        const btn = document.getElementById(`opt-${qi}-${oi}`);
+        btn.disabled = true;
+        btn.classList.remove('selected');
+        if (oi === q.ans) btn.classList.add('correct-ans');
+        else if (oi === chosen && chosen !== q.ans) btn.classList.add('wrong-ans');
+      });
+      if (chosen === q.ans) {
+        score++;
+        block.classList.add('correct');
+        fb.textContent = '✓ Correct! ' + q.exp;
+        fb.className = 'q-feedback show ok';
+      } else {
+        block.classList.add('wrong');
+        fb.textContent = '✗ ' + (chosen === undefined ? 'No answer selected. ' : '') + q.exp;
+        fb.className = 'q-feedback show bad';
+      }
+    });
+    const scoreEl = document.getElementById('quiz-score');
+    const pct = Math.round((score/total)*100);
+    scoreEl.innerHTML = `<div class="score-num">${score}/${total}</div><div class="score-label">${pct}% — ${pct>=80?'Great work! 🎉':pct>=60?'Good effort — review the explanations above.':'Review the reading and try again.'}</div>`;
+    scoreEl.classList.add('show');
+    if (pct >= 60) done.add(current);
+    updateProgress();
+    refreshSidebar();
+  };
+}
+
+// ── CODE ──
+function renderCode(container, lesson) {
+  const ch = lesson.challenge;
+  let reqHTML = ch.requirements.map(r => `<li>${r}</li>`).join('');
+  container.innerHTML = `
+  <div class="code-section">
+    <h2>${ch.title}</h2>
+    <p class="tagline">⌨ Go Code Challenge</p>
+    <div class="challenge-desc">
+      <h3>Challenge</h3>
+      <p style="font-size:14px;line-height:1.7;margin-bottom:12px">${ch.desc}</p>
+      <h3 style="margin-top:12px">Requirements</h3>
+      <ul class="hints-list">${reqHTML}</ul>
+    </div>
+    <div class="editor-wrap">
+      <div class="editor-header">
+        <span>main.go</span>
+        <div class="editor-actions">
+          <button class="editor-btn" onclick="resetCode()">Reset</button>
+          <button class="editor-btn" onclick="showSolution()">Show Solution</button>
+          <button class="editor-btn run-btn" onclick="runChecks()">▶ Check Code</button>
+        </div>
+      </div>
+      <textarea id="code-editor" spellcheck="false">${escHtml(ch.starter)}</textarea>
+    </div>
+    <div class="output-panel" id="output-panel"><span style="color:var(--muted)">Click "Check Code" to validate your implementation...</span></div>
+    <div class="solution-panel" id="solution-panel">
+      <h4>✓ Reference Solution</h4>
+      <pre>${escHtml(ch.solution)}</pre>
+    </div>
+  </div>`;
+
+  // Tab key in textarea
+  document.getElementById('code-editor').addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = this.selectionStart, end = this.selectionEnd;
+      this.value = this.value.substring(0,s) + '\t' + this.value.substring(end);
+      this.selectionStart = this.selectionEnd = s + 1;
+    }
+  });
+
+  window.resetCode = () => {
+    document.getElementById('code-editor').value = ch.starter;
+    document.getElementById('output-panel').innerHTML = '<span style="color:var(--muted)">Reset. Click "Check Code" to validate...</span>';
+    document.getElementById('solution-panel').classList.remove('show');
+  };
+
+  window.showSolution = () => {
+    document.getElementById('solution-panel').classList.toggle('show');
+  };
+
+  window.runChecks = () => {
+    const code = document.getElementById('code-editor').value;
+    const out = document.getElementById('output-panel');
+    let lines = [];
+    let passed = 0;
+    ch.checks.forEach(chk => {
+      const ok = chk.pattern.test(code);
+      if (ok) passed++;
+      lines.push(`<div class="out-line ${ok?'out-ok':'out-err'}">${ok?'✓':'✗'} ${chk.msg}</div>`);
+    });
+    const total = ch.checks.length;
+    const pct = Math.round((passed/total)*100);
+    lines.push(`<div class="out-line" style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;color:${pct===100?'var(--success)':pct>=70?'var(--warn)':'var(--error)'}">${passed}/${total} checks passed (${pct}%)</div>`);
+    if (pct === 100) {
+      lines.push(`<div class="out-line out-ok" style="margin-top:6px">🎉 All checks passed! Well done.</div>`);
+      done.add(current);
+      updateProgress();
+      refreshSidebar();
+    }
+    out.innerHTML = lines.join('');
+  };
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+buildSidebar();
+render();
+updateProgress();
+</script>
+</body>
+</html>
