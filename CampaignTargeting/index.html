@@ -237,7 +237,7 @@ const CURRICULUM = [
         <tr><td><strong>Out-of-Home Ads</strong></td><td>All advertisers</td><td>On-package, in-store, locker screens</td><td>Varies</td></tr>
         <tr><td><strong>Amazon DSP</strong></td><td>Agencies, brands (managed/self-serve)</td><td>All Amazon + publisher network</td><td>CPM</td></tr>
       </table>
-      <div class="callout warn">⚠️ <strong>CTV ≠ DSP.</strong> Streaming TV ads can now be bought via Sponsored Display (no minimum spend) OR Amazon DSP (self-serve $10K min, managed $50K min). Don't assume CTV requires DSP access.</div>
+      <div class="callout warn">⚠️ <strong>CTV ≠ DSP.</strong> Streaming TV ads can now be bought via Sponsored Display (no minimum spend) OR Amazon DSP (self-serve — no enforced minimum, managed service ~$35K/quarter). Don't assume CTV requires DSP access.</div>
     </div>
     <div class="card">
       <h3>Streaming TV (CTV) — The Fast-Growing Format</h3>
@@ -309,8 +309,8 @@ const CURRICULUM = [
         <tr><th>Setting</th><th>Options</th><th>Notes</th></tr>
         <tr><td>Targeting Type</td><td>Manual / Automatic</td><td>Automatic lets Amazon pick targets</td></tr>
         <tr><td>Budget Type</td><td>Daily / Lifetime</td><td>Daily resets each calendar day</td></tr>
-        <tr><td>Bidding Strategy</td><td>Fixed CPC / Dynamic Up+Down / Down Only</td><td>Dynamic allows Amazon to adjust bids ±900%</td></tr>
-        <tr><td>Placement Modifiers</td><td>Top of Search, Product Pages, Rest of Search</td><td>% multiplier on top of your keyword bid</td></tr>
+        <tr><td>Bidding Strategy</td><td>Fixed bids / Dynamic bids — down only / Dynamic bids — up and down</td><td>Dynamic up &amp; down raises bids up to +100% for top placements, lowers for low-conversion placements</td></tr>
+        <tr><td>Placement Modifiers</td><td>Top of Search, Product Pages, Rest of Search</td><td>Separate % multiplier (0–900%) layered on top of your keyword bid and bidding strategy</td></tr>
       </table>
     </div>
     <div class="card">
@@ -353,8 +353,8 @@ const CURRICULUM = [
       <table>
         <tr><th>Path</th><th>Minimum</th><th>Access</th></tr>
         <tr><td><strong>Sponsored Display</strong> (self-serve)</td><td>No minimum</td><td>Seller/vendor console</td></tr>
-        <tr><td><strong>Amazon DSP</strong> self-serve</td><td>$10,000/campaign recommended</td><td>DSP console or API</td></tr>
-        <tr><td><strong>Amazon DSP</strong> managed service</td><td>$50,000/campaign</td><td>Amazon account team</td></tr>
+        <tr><td><strong>Amazon DSP</strong> self-serve</td><td>No enforced minimum (agencies typically recommend $10K+/month for meaningful data)</td><td>DSP console or API</td></tr>
+        <tr><td><strong>Amazon DSP</strong> managed service</td><td>~$35,000/quarter engagement minimum</td><td>Amazon account team</td></tr>
       </table>
       <div class="callout tip">✅ For most sellers just getting into CTV, start with <strong>Sponsored Display streaming TV</strong> — no minimum, uses the same campaign console you already know, and targets using Amazon's first-party audiences.</div>
     </div>
@@ -396,7 +396,7 @@ const CURRICULUM = [
       q: "Which Amazon ad format delivers full-screen, non-skippable video ads on Prime Video, Fire TV, and Twitch?",
       opts: ["Sponsored Brands Video", "Streaming TV Ads (CTV)", "Sponsored Display Video", "Out-of-Stream Video"],
       ans: 1,
-      exp: "Streaming TV Ads (CTV) are full-screen, non-skippable ads that run on Prime Video, Fire TV Channels, Twitch, and Amazon Publisher Direct. They are priced on CPM and can be bought via Sponsored Display (no minimum) or Amazon DSP ($10K+ minimum)."
+      exp: "Streaming TV Ads (CTV) are full-screen, non-skippable ads that run on Prime Video, Fire TV Channels, Twitch, and Amazon Publisher Direct. They are priced on CPM and can be bought via Sponsored Display (no minimum) or Amazon DSP (self-serve has no enforced minimum; managed service requires ~$35K/quarter)."
     },
     {
       q: "An advertiser has Spend = $500 and Revenue = $2,000. What is their ACOS?",
@@ -462,9 +462,9 @@ const CURRICULUM = [
       <h3>Bid Strategies</h3>
       <table>
         <tr><th>Strategy</th><th>Behavior</th><th>Best For</th></tr>
-        <tr><td>Fixed CPC</td><td>Amazon never adjusts your bid</td><td>Tight budget control</td></tr>
-        <tr><td>Dynamic Down Only</td><td>Amazon lowers bids for low-conversion placements</td><td>Efficiency focus</td></tr>
-        <tr><td>Dynamic Up + Down</td><td>Amazon adjusts bids up or down based on conversion likelihood</td><td>Growth / aggressive bidding</td></tr>
+        <tr><td>Fixed bids</td><td>Amazon never adjusts your bid</td><td>Tight budget control</td></tr>
+        <tr><td>Dynamic bids — down only</td><td>Amazon lowers bids for low-conversion placements, never raises</td><td>Efficiency focus</td></tr>
+        <tr><td>Dynamic bids — up and down</td><td>Amazon raises bids up to +100% for high-conversion placements, lowers for low</td><td>Growth / aggressive bidding</td></tr>
       </table>
     </div>
   </div>`
@@ -508,7 +508,7 @@ const CURRICULUM = [
         <li><strong>Pixel-based</strong>: Your own website visitors via Amazon Publisher Services</li>
         <li><strong>Lookalike</strong>: Shoppers similar to your existing buyer list</li>
       </ul>
-      <div class="callout info">💡 DSP uses CPM (cost per 1,000 impressions) not CPC. Minimum spends are typically $10–35k/month.</div>
+      <div class="callout info">💡 DSP uses CPM (cost per 1,000 impressions) not CPC. Self-serve DSP has no enforced minimum — agencies recommend $10K+/month for meaningful data. Managed service requires ~$35K/quarter commitment.</div>
     </div>
   </div>`
 },
@@ -567,15 +567,16 @@ const CURRICULUM = [
       <h3>What is the Amazon Ads API?</h3>
       <p>The Amazon Advertising API is a REST API that gives programmatic access to everything in Amazon Ads: campaigns, ad groups, keywords, bids, budgets, and reports. It's the engine behind every third-party ads management tool (Perpetua, Pacvue, Skai, etc.).</p>
       <div class="callout warn">⚠️ <strong>API v2 is deprecated.</strong> All new development must use <strong>v3</strong> for Sponsored Products, Sponsored Brands, and Sponsored Display. The v3 APIs use versioned <code>Accept</code> headers and have different request/response shapes than v2.</div>
+      <div class="callout info">🌍 <strong>Regional base URLs:</strong> The API domain is <code>advertising-api.amazon.com</code> (NOT <code>advertising.amazon.com</code>, which is the web console). Use the right region: North America → <code>advertising-api.amazon.com</code> | Europe → <code>advertising-api-eu.amazon.com</code> | Far East → <code>advertising-api-fe.amazon.com</code></div>
       <table>
-        <tr><th>Product</th><th>Base URL</th><th>Notes</th></tr>
-        <tr><td>Sponsored Products v3</td><td><code>https://advertising.amazon.com/sp/</code></td><td>Current — use versioned Accept header</td></tr>
-        <tr><td>Sponsored Brands v3</td><td><code>https://advertising.amazon.com/sb/</code></td><td>Current</td></tr>
-        <tr><td>Sponsored Display v3</td><td><code>https://advertising.amazon.com/sd/</code></td><td>Current</td></tr>
-        <tr><td>Sponsored TV</td><td><code>https://advertising.amazon.com/stv/</code></td><td>Newer self-serve CTV API</td></tr>
-        <tr><td>DSP</td><td><code>https://advertising.amazon.com/dsp/</code></td><td>Separate auth scope</td></tr>
-        <tr><td>Reports v3</td><td><code>https://advertising.amazon.com/reporting/reports</code></td><td>Async — poll for completion</td></tr>
-        <tr><td>Amazon Marketing Cloud</td><td><code>https://marketing-stream.amazon.com/</code></td><td>SQL clean room — see Module 6</td></tr>
+        <tr><th>Product</th><th>Path (append to regional base URL)</th><th>Notes</th></tr>
+        <tr><td>Sponsored Products v3</td><td><code>/sp/campaigns</code>, <code>/sp/adGroups</code>, <code>/sp/keywords</code></td><td>Current — use versioned Accept header</td></tr>
+        <tr><td>Sponsored Brands v3</td><td><code>/sb/campaigns</code>, <code>/sb/keywords</code></td><td>Current</td></tr>
+        <tr><td>Sponsored Display v3</td><td><code>/sd/campaigns</code>, <code>/sd/targets</code></td><td>Current</td></tr>
+        <tr><td>Sponsored TV</td><td><code>/stv/campaigns</code></td><td>Newer self-serve CTV API</td></tr>
+        <tr><td>DSP</td><td><code>/dsp/campaigns</code>, <code>/dsp/lineItems</code></td><td>Separate auth scope</td></tr>
+        <tr><td>Reports v3</td><td><code>/reporting/reports</code></td><td>Async — poll for completion</td></tr>
+        <tr><td>Amazon Marketing Cloud</td><td><code>/amc/reporting/workgroups/{id}/queries</code></td><td>SQL clean room — see Module 6</td></tr>
       </table>
     </div>
     <div class="card">
@@ -635,8 +636,8 @@ Content-Type: application/json</pre>
     <div class="card">
       <h3>The Critical v3 Difference: Versioned Accept Headers</h3>
       <p>In SP API v3, you don't just change the URL — you send a versioned <code>Accept</code> header that tells Amazon which schema version you expect back. This is what breaks v2 clients silently.</p>
-      <pre><span class="cm">// v3 Campaign list — note the Accept header</span>
-<span class="kw">GET</span> https://advertising.amazon.com/sp/campaigns
+      <pre><span class="cm">// v3 Campaign list — note the Accept header and regional base URL</span>
+<span class="kw">GET</span> https://advertising-api.amazon.com/sp/campaigns
 Accept: <span class="str">application/vnd.spCampaign.v3+json</span>
 Amazon-Advertising-API-ClientId: <span class="str">amzn1.application-oa2-client.xxx</span>
 Amazon-Advertising-API-Scope: <span class="str">1234567890</span>
@@ -649,16 +650,16 @@ Authorization: Bearer <span class="str">Atza|...</span>
     <span class="str">"name"</span>: <span class="str">"SP | Brand | Exact"</span>,
     <span class="str">"state"</span>: <span class="str">"ENABLED"</span>,             <span class="cm">// UPPERCASE in v3</span>
     <span class="str">"targetingType"</span>: <span class="str">"MANUAL"</span>,
-    <span class="str">"budget"</span>: { <span class="str">"budget"</span>: <span class="nm">50.00</span>, <span class="str">"budgetType"</span>: <span class="str">"DAILY"</span> },
-    <span class="str">"startDate"</span>: <span class="str">"2024-01-01"</span>       <span class="cm">// ISO 8601 in v3, not YYYYMMDD</span>
+    <span class="str">"budget"</span>: { <span class="str">"budget"</span>: <span class="nm">50.00</span>, <span class="str">"budgetType"</span>: <span class="str">"daily"</span> }  <span class="cm">// lowercase: "daily" or "lifetime"</span>,
+    <span class="str">"startDate"</span>: <span class="str">"20240101"</span>         <span class="cm">// YYYYMMDD format (same as v2)</span>
   }],
   <span class="str">"totalResults"</span>: <span class="nm">1</span>
 }</pre>
-      <div class="callout warn">⚠️ <strong>Three breaking changes from v2 to v3:</strong> (1) campaignId is now a <strong>string</strong>, not an integer. (2) State values are <strong>UPPERCASE</strong>. (3) Dates use <strong>ISO 8601</strong> (2024-01-01) not YYYYMMDD.</div>
+      <div class="callout warn">⚠️ <strong>Two breaking changes from v2 to v3:</strong> (1) campaignId is now a <strong>string</strong>, not an integer. (2) State values are <strong>UPPERCASE</strong> (ENABLED, PAUSED, ARCHIVED). Note: <code>startDate</code> stays in <strong>YYYYMMDD</strong> format in v3 — not ISO 8601.</div>
     </div>
     <div class="card">
       <h3>Profile Discovery (unchanged)</h3>
-      <pre><span class="kw">GET</span> https://advertising.amazon.com/v2/profiles
+      <pre><span class="kw">GET</span> https://advertising-api.amazon.com/v2/profiles
 <span class="cm">// Still v2 — profiles endpoint has not changed</span>
 [{
   <span class="str">"profileId"</span>: <span class="nm">1234567890</span>,
@@ -683,8 +684,8 @@ Accept:       <span class="str">application/vnd.spCampaign.v3+json</span>
     <span class="str">"name"</span>: <span class="str">"SP | Brand | Exact"</span>,
     <span class="str">"targetingType"</span>: <span class="str">"MANUAL"</span>,
     <span class="str">"state"</span>: <span class="str">"ENABLED"</span>,
-    <span class="str">"budget"</span>: { <span class="str">"budget"</span>: <span class="nm">50.00</span>, <span class="str">"budgetType"</span>: <span class="str">"DAILY"</span> },
-    <span class="str">"startDate"</span>: <span class="str">"2024-01-01"</span>
+    <span class="str">"budget"</span>: { <span class="str">"budget"</span>: <span class="nm">50.00</span>, <span class="str">"budgetType"</span>: <span class="str">"daily"</span> }  <span class="cm">// lowercase: "daily" or "lifetime"</span>,
+    <span class="str">"startDate"</span>: <span class="str">"20240101"</span>          <span class="cm">// YYYYMMDD — same format as v2</span>
   }]
 }
 
@@ -715,7 +716,7 @@ Content-Type: <span class="str">application/vnd.spKeyword.v3+json</span>
     <div class="card">
       <h3>Reports API (v3 Async — unchanged flow)</h3>
       <pre><span class="cm">// 1. Create report — POST</span>
-<span class="kw">POST</span> https://advertising.amazon.com/reporting/reports
+<span class="kw">POST</span> https://advertising-api.amazon.com/reporting/reports
 {
   <span class="str">"name"</span>: <span class="str">"SP Search Term Report"</span>,
   <span class="str">"startDate"</span>: <span class="str">"2024-01-01"</span>,
@@ -732,7 +733,7 @@ Content-Type: <span class="str">application/vnd.spKeyword.v3+json</span>
 <span class="cm">// Returns: { "reportId": "abc123", "status": "PENDING" }</span>
 
 <span class="cm">// 2. Poll — GET (every 10–30s)</span>
-<span class="kw">GET</span> https://advertising.amazon.com/reporting/reports/{reportId}
+<span class="kw">GET</span> https://advertising-api.amazon.com/reporting/reports/{reportId}
 <span class="cm">// status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED"</span>
 <span class="cm">// On COMPLETED: response includes "url" (presigned S3, expires in 30min)</span>
 
@@ -751,7 +752,7 @@ You need to model: the auth token response from LWA, an API client with the requ
     requirements: [
       "Define a `TokenResponse` struct with fields: AccessToken (string), RefreshToken (string), ExpiresIn (int), TokenType (string) — use proper JSON tags",
       "Define an `AdsClient` struct with: ClientID, ProfileID, AccessToken (all strings) and an http.Client",
-      "Define a `Campaign` struct with: CampaignID (int64), Name, State, TargetingType (strings), DailyBudget (float64), StartDate (string) — JSON tags must match the API (camelCase)",
+      "Define a `Campaign` struct with: CampaignID (string — SP API v3 IDs are strings, not integers), Name, State, TargetingType (strings), DailyBudget (float64), StartDate (string) — JSON tags must match the API (camelCase)",
       "Add a `NewAdsClient(clientID, profileID, accessToken string) *AdsClient` constructor"
     ],
     starter: `package main
@@ -770,7 +771,7 @@ import (
 
 
 // TODO: Define Campaign struct
-// Fields: campaignId (int64), name, state, targetingType, dailyBudget, startDate
+// Fields: campaignId (string — v3 IDs are strings), name, state, targetingType, dailyBudget, startDate
 
 
 // TODO: Implement NewAdsClient constructor
@@ -784,7 +785,7 @@ func main() {
 	)
 
 	campaign := Campaign{
-		CampaignID:    9876543210,
+		CampaignID:    "9876543210",
 		Name:          "SP | Brand | Exact",
 		State:         "enabled",
 		TargetingType: "manual",
@@ -818,7 +819,7 @@ type AdsClient struct {
 }
 
 type Campaign struct {
-	CampaignID    int64   \`json:"campaignId"\`
+	CampaignID    string  \`json:"campaignId"\`
 	Name          string  \`json:"name"\`
 	State         string  \`json:"state"\`
 	TargetingType string  \`json:"targetingType"\`
@@ -843,7 +844,7 @@ func main() {
 	)
 
 	campaign := Campaign{
-		CampaignID:    9876543210,
+		CampaignID:    "9876543210",
 		Name:          "SP | Brand | Exact",
 		State:         "enabled",
 		TargetingType: "manual",
@@ -861,7 +862,7 @@ func main() {
       { pattern: /type\s+AdsClient\s+struct/, msg: "AdsClient struct defined" },
       { pattern: /\*http\.Client/, msg: "HTTPClient field is *http.Client" },
       { pattern: /type\s+Campaign\s+struct/, msg: "Campaign struct defined" },
-      { pattern: /int64/, msg: "CampaignID is int64" },
+      { pattern: /CampaignID\s+string/, msg: "CampaignID is string (SP API v3 IDs are strings, not integers)" },
       { pattern: /float64/, msg: "DailyBudget is float64" },
       { pattern: /func\s+NewAdsClient/, msg: "NewAdsClient constructor defined" },
       { pattern: /return\s+&AdsClient/, msg: "Constructor returns pointer to AdsClient" },
@@ -881,7 +882,7 @@ func main() {
       "Set `Amazon-Advertising-API-ClientId` header to ClientID",
       "Set `Amazon-Advertising-API-Scope` header to ProfileID",
       "Set `Content-Type: application/json` header",
-      "Use the base URL `https://advertising.amazon.com` + endpoint",
+      "Use the regional base URL `https://advertising-api.amazon.com` + endpoint",
     ],
     starter: `package main
 
@@ -904,7 +905,7 @@ func NewAdsClient(clientID, profileID, accessToken string) *AdsClient {
 		ProfileID:   profileID,
 		AccessToken: accessToken,
 		HTTPClient:  &http.Client{},
-		BaseURL:     "https://advertising.amazon.com",
+		BaseURL:     "https://advertising-api.amazon.com",
 	}
 }
 
@@ -954,7 +955,7 @@ func NewAdsClient(clientID, profileID, accessToken string) *AdsClient {
 		ProfileID:   profileID,
 		AccessToken: accessToken,
 		HTTPClient:  &http.Client{},
-		BaseURL:     "https://advertising.amazon.com",
+		BaseURL:     "https://advertising-api.amazon.com",
 	}
 }
 
@@ -1181,7 +1182,6 @@ func WithRetry(cfg RetryConfig, fn func() error) error {
 		}
 		jitter := 0.5 + rand.Float64() // [0.5, 1.5]
 		delay = time.Duration(float64(delay) * jitter)
-		fmt.Fprintf(nil, "") // suppress unused import — real code uses os.Stderr
 		fmt.Printf("[retry] attempt %d failed, waiting %v\\n", i+1, delay.Round(time.Millisecond))
 		time.Sleep(delay)
 	}
@@ -1459,10 +1459,11 @@ func main() {
                                       │  - Resources     │
                                       │  - Prompts       │
                                       └──────────────────┘</pre>
-      <p>Communication uses <strong>JSON-RPC 2.0</strong> over either:</p>
+      <p>Communication uses <strong>JSON-RPC 2.0</strong> over one of three transports:</p>
       <ul>
-        <li><strong>stdio</strong>: Server spawned as a child process (most common for local tools)</li>
-        <li><strong>SSE (HTTP)</strong>: Remote server over HTTP with Server-Sent Events</li>
+        <li><strong>stdio</strong>: Server spawned as a child process — most common for local tools and development</li>
+        <li><strong>Streamable HTTP</strong>: Current recommended remote transport — POST requests with optional streaming response (supersedes the older SSE transport in the 2025 MCP spec revision)</li>
+        <li><strong>SSE (HTTP+SSE)</strong>: Older remote transport — still functional but Streamable HTTP is now preferred</li>
       </ul>
     </div>
     <div class="card">
@@ -1483,8 +1484,8 @@ func main() {
     <span class="str">"type"</span>: <span class="str">"object"</span>,
     <span class="str">"properties"</span>: {
       <span class="str">"campaignId"</span>: {
-        <span class="str">"type"</span>: <span class="str">"integer"</span>,
-        <span class="str">"description"</span>: <span class="str">"The numeric campaign ID"</span>
+        <span class="str">"type"</span>: <span class="str">"string"</span>,
+        <span class="str">"description"</span>: <span class="str">"The campaign ID (string in SP API v3)"</span>
       },
       <span class="str">"profileId"</span>: {
         <span class="str">"type"</span>: <span class="str">"string"</span>,
@@ -1511,38 +1512,51 @@ func main() {
       <div class="callout tip">✅ Instead of writing custom API integration code, you configure the MCP server once and Claude can then manage campaigns, pull reports, adjust bids — all through conversation.</div>
     </div>
     <div class="card">
-      <h3>Key MCP Tools Exposed</h3>
+      <h3>Categories of MCP Tools Exposed</h3>
+      <div class="callout info">💡 Exact tool names vary by which MCP server you use (official Amazon vs. community). The naming convention typically uses a product prefix (<code>sp_</code>, <code>sb_</code>, <code>dsp_</code>, <code>amc_</code>) followed by the action. The official Amazon server has 50+ tools. The examples below use the convention from Module 9 practice exercises.</div>
       <table>
-        <tr><th>Tool Name</th><th>What It Does</th></tr>
-        <tr><td><code>list_profiles</code></td><td>Returns all accessible advertiser profiles</td></tr>
-        <tr><td><code>list_campaigns</code></td><td>Lists campaigns for a profile with optional filters</td></tr>
-        <tr><td><code>get_campaign</code></td><td>Fetches a single campaign by ID</td></tr>
-        <tr><td><code>create_campaign</code></td><td>Creates a new SP/SB/SD campaign</td></tr>
-        <tr><td><code>update_campaign</code></td><td>Modifies budget, state, or bidding strategy</td></tr>
-        <tr><td><code>list_keywords</code></td><td>Lists keywords in an ad group</td></tr>
-        <tr><td><code>create_keywords</code></td><td>Adds new keywords with bids and match types</td></tr>
-        <tr><td><code>update_keyword_bid</code></td><td>Changes bid for specific keywords</td></tr>
-        <tr><td><code>request_report</code></td><td>Initiates an async report request</td></tr>
-        <tr><td><code>get_report_status</code></td><td>Polls report completion</td></tr>
-        <tr><td><code>download_report</code></td><td>Fetches and parses completed report data</td></tr>
+        <tr><th>Tool Name (example)</th><th>What It Does</th></tr>
+        <tr><td><code>sp_get_campaigns</code></td><td>Lists Sponsored Products campaigns for a profile</td></tr>
+        <tr><td><code>sp_create_campaign</code></td><td>Creates a new SP campaign</td></tr>
+        <tr><td><code>sp_update_campaign</code></td><td>Modifies budget, state, or bidding strategy</td></tr>
+        <tr><td><code>sp_get_keyword_metrics</code></td><td>Returns clicks, spend, sales, ACOS for a keyword</td></tr>
+        <tr><td><code>sp_update_keyword_bid</code></td><td>Changes bid for a specific keyword</td></tr>
+        <tr><td><code>sp_create_keywords</code></td><td>Adds new keywords with bids and match types</td></tr>
+        <tr><td><code>sp_get_reports</code></td><td>Initiates an async report request</td></tr>
+        <tr><td><code>sb_update_budget</code></td><td>Modifies Sponsored Brands campaign budget</td></tr>
+        <tr><td><code>dsp_get_audiences</code></td><td>Lists DSP audience segments</td></tr>
+        <tr><td><code>amc_run_query</code></td><td>Executes an AMC SQL query and returns execution ID</td></tr>
       </table>
     </div>
     <div class="card">
-      <h3>MCP Server Configuration (claude_desktop_config.json)</h3>
+      <h3>Two Ways to Access an Amazon Ads MCP Server</h3>
+      <p><strong>Option A — Official Amazon Ads MCP Server (open beta, Feb 2026)</strong><br>
+      Amazon launched an official MCP server in open beta. Access requires active Amazon Ads API partner credentials. Get the current package name and setup instructions from the official docs: <strong>advertising.amazon.com/API/docs/en-us/mcp/mcp-overview</strong></p>
+
+      <p style="margin-top:10px"><strong>Option B — Community server (MarketplaceAdPros)</strong><br>
+      A widely-used community MCP server is available via npx. It uses a <code>BEARER_TOKEN</code> from their platform rather than raw LWA credentials:</p>
       <pre>{
   <span class="str">"mcpServers"</span>: {
     <span class="str">"amazon-ads"</span>: {
       <span class="str">"command"</span>: <span class="str">"npx"</span>,
-      <span class="str">"args"</span>: [<span class="str">"@amazon-ads/mcp-server"</span>],
+      <span class="str">"args"</span>: [<span class="str">"@marketplaceadpros/amazon-ads-mcp-server"</span>],
       <span class="str">"env"</span>: {
-        <span class="str">"AMAZON_ADS_CLIENT_ID"</span>: <span class="str">"amzn1.application-oa2-client.xxx"</span>,
-        <span class="str">"AMAZON_ADS_CLIENT_SECRET"</span>: <span class="str">"your_secret"</span>,
-        <span class="str">"AMAZON_ADS_REFRESH_TOKEN"</span>: <span class="str">"Atzr|your_refresh_token"</span>,
-        <span class="str">"AMAZON_ADS_PROFILE_ID"</span>: <span class="str">"1234567890"</span>
+        <span class="str">"BEARER_TOKEN"</span>: <span class="str">"your_token_from_marketplaceadpros.com"</span>
       }
     }
   }
 }</pre>
+      <p style="margin-top:10px"><strong>Option C — Streamable HTTP (remote MCP server)</strong><br>
+      You can also connect to a hosted MCP server over HTTP — no local process needed:</p>
+      <pre>{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"amazon-ads"</span>: {
+      <span class="str">"type"</span>: <span class="str">"streamable-http"</span>,
+      <span class="str">"url"</span>: <span class="str">"https://app.marketplaceadpros.com/mcp"</span>
+    }
+  }
+}</pre>
+      <div class="callout info">💡 The pattern is the same regardless of which server you use: the MCP server holds the API credentials and your AI orchestration code (Claude + your Go app) calls it via JSON-RPC without ever seeing the raw Amazon Ads tokens.</div>
     </div>
     <div class="card">
       <h3>How a Tool Call Flows</h3>
@@ -1568,7 +1582,7 @@ func main() {
       "Define `MCPProperty` struct with: Type, Description (string) and Enum ([]string) — with JSON tags",
       "Define `MCPInputSchema` struct with: Type (string), Properties (map[string]MCPProperty), Required ([]string)",
       "Define `MCPTool` struct with: Name, Description (string), InputSchema (MCPInputSchema)",
-      "Instantiate a complete `MCPTool` for `update_keyword_bid` that accepts keywordId (integer), bid (number), and profileId (string) — all required"
+      "Instantiate a complete `MCPTool` for `update_keyword_bid` that accepts keywordId (string — SP API v3 IDs are strings), bid (number), and profileId (string) — all required"
     ],
     starter: `package main
 
@@ -1637,8 +1651,8 @@ func main() {
 			Type: "object",
 			Properties: map[string]MCPProperty{
 				"keywordId": {
-					Type:        "integer",
-					Description: "The numeric keyword ID to update",
+					Type:        "string",
+					Description: "The keyword ID to update (string in SP API v3)",
 				},
 				"bid": {
 					Type:        "number",
@@ -1663,7 +1677,7 @@ func main() {
       { pattern: /map\[string\]MCPProperty/, msg: "Properties is map[string]MCPProperty" },
       { pattern: /type\s+MCPTool\s+struct/, msg: "MCPTool struct defined" },
       { pattern: /update_keyword_bid/, msg: "Tool name is update_keyword_bid" },
-      { pattern: /integer/, msg: "keywordId uses type integer" },
+      { pattern: /"string"/, msg: "keywordId uses type string (SP API v3 IDs are strings)" },
       { pattern: /number/, msg: "bid uses type number" },
       { pattern: /Required.*\[/, msg: "Required field is populated" },
     ]
@@ -1679,11 +1693,11 @@ func main() {
       opts: [
         "gRPC and REST",
         "WebSockets and GraphQL",
-        "stdio (child process) and SSE over HTTP",
+        "stdio (child process) and Streamable HTTP for remote servers",
         "AMQP and MQTT"
       ],
       ans: 2,
-      exp: "MCP uses stdio (the server is spawned as a child process) for local tools, and SSE (Server-Sent Events) over HTTP for remote servers. Both use JSON-RPC 2.0 messages."
+      exp: "MCP uses stdio (the server is spawned as a child process) for local tools, and Streamable HTTP for remote servers — this superseded the older SSE transport in the 2025 MCP spec revision. SSE still works but Streamable HTTP is now the preferred remote transport. All transports use JSON-RPC 2.0 messages."
     },
     {
       q: "What is the difference between an MCP Tool and an MCP Resource?",
@@ -1778,8 +1792,8 @@ Example:
     title: "Implement a Bid Optimizer",
     desc: "Write a Go function that takes current keyword performance data and calculates optimized bids using the Target ACOS formula.",
     requirements: [
-      "Define a `KeywordPerf` struct with: KeywordID (int64), CurrentBid, ActualACOS, Spend, Revenue (all float64)",
-      "Define a `BidRecommendation` struct with: KeywordID (int64), CurrentBid, RecommendedBid, ChangePercent (float64), Action (string)",
+      "Define a `KeywordPerf` struct with: KeywordID (string — SP API v3 IDs are strings), CurrentBid, ActualACOS, Spend, Revenue (float64)",
+      "Define a `BidRecommendation` struct with: KeywordID (string), CurrentBid, RecommendedBid, ChangePercent (float64), Action (string)",
       "Implement `OptimizeBid(kw KeywordPerf, targetACOS float64) BidRecommendation`",
       "If ActualACOS is 0 (no sales data), set Action to 'HOLD' and keep current bid",
       "Cap bid changes at ±30% (clamp new bid to [currentBid*0.70, currentBid*1.30])",
@@ -1800,16 +1814,16 @@ import (
 
 func main() {
 	keywords := []KeywordPerf{
-		{KeywordID: 1001, CurrentBid: 1.50, ActualACOS: 0.40, Spend: 120, Revenue: 300},
-		{KeywordID: 1002, CurrentBid: 0.80, ActualACOS: 0.15, Spend: 60, Revenue: 400},
-		{KeywordID: 1003, CurrentBid: 1.20, ActualACOS: 0.00, Spend: 10, Revenue: 0},
+		{KeywordID: "KW-1001", CurrentBid: 1.50, ActualACOS: 0.40, Spend: 120, Revenue: 300},
+		{KeywordID: "KW-1002", CurrentBid: 0.80, ActualACOS: 0.15, Spend: 60, Revenue: 400},
+		{KeywordID: "KW-1003", CurrentBid: 1.20, ActualACOS: 0.00, Spend: 10, Revenue: 0},
 	}
 
 	targetACOS := 0.25
 
 	for _, kw := range keywords {
 		rec := OptimizeBid(kw, targetACOS)
-		fmt.Printf("Keyword %d: $%.2f → $%.2f (%.1f%%) [%s]\\n",
+		fmt.Printf("Keyword %s: $%.2f → $%.2f (%.1f%%) [%s]\\n",
 			rec.KeywordID, rec.CurrentBid, rec.RecommendedBid, rec.ChangePercent, rec.Action)
 	}
 }
@@ -1822,7 +1836,7 @@ import (
 )
 
 type KeywordPerf struct {
-	KeywordID  int64
+	KeywordID  string  // SP API v3 IDs are strings
 	CurrentBid float64
 	ActualACOS float64
 	Spend      float64
@@ -1830,7 +1844,7 @@ type KeywordPerf struct {
 }
 
 type BidRecommendation struct {
-	KeywordID      int64
+	KeywordID      string  // SP API v3 IDs are strings
 	CurrentBid     float64
 	RecommendedBid float64
 	ChangePercent  float64
@@ -1876,16 +1890,16 @@ func OptimizeBid(kw KeywordPerf, targetACOS float64) BidRecommendation {
 
 func main() {
 	keywords := []KeywordPerf{
-		{KeywordID: 1001, CurrentBid: 1.50, ActualACOS: 0.40, Spend: 120, Revenue: 300},
-		{KeywordID: 1002, CurrentBid: 0.80, ActualACOS: 0.15, Spend: 60, Revenue: 400},
-		{KeywordID: 1003, CurrentBid: 1.20, ActualACOS: 0.00, Spend: 10, Revenue: 0},
+		{KeywordID: "KW-1001", CurrentBid: 1.50, ActualACOS: 0.40, Spend: 120, Revenue: 300},
+		{KeywordID: "KW-1002", CurrentBid: 0.80, ActualACOS: 0.15, Spend: 60, Revenue: 400},
+		{KeywordID: "KW-1003", CurrentBid: 1.20, ActualACOS: 0.00, Spend: 10, Revenue: 0},
 	}
 
 	targetACOS := 0.25
 
 	for _, kw := range keywords {
 		rec := OptimizeBid(kw, targetACOS)
-		fmt.Printf("Keyword %d: $%.2f → $%.2f (%.1f%%) [%s]\\n",
+		fmt.Printf("Keyword %s: $%.2f → $%.2f (%.1f%%) [%s]\\n",
 			rec.KeywordID, rec.CurrentBid, rec.RecommendedBid, rec.ChangePercent, rec.Action)
 	}
 }`,
@@ -2079,8 +2093,14 @@ streaming_views      <span class="cm">-- CTV completion events, quartile (25/50/
     </div>
     <div class="card">
       <h3>AMC API Flow (for AI Agents)</h3>
-      <pre><span class="cm">// 1. Submit a query</span>
-<span class="kw">POST</span> https://marketing-stream.amazon.com/amc/query/execute
+      <div class="callout warn">⚠️ <strong>Note:</strong> <code>marketing-stream.amazon.com</code> is Amazon Marketing Stream (a separate push-based data product). The AMC query API lives under the Amazon Ads API at <code>advertising-api.amazon.com</code>.</div>
+      <pre><span class="cm">// 1. Submit a query — use your regional Ads API base URL</span>
+<span class="kw">POST</span> https://advertising-api.amazon.com/amc/reporting/workgroups/{workgroupId}/queries
+Headers:
+  Authorization: Bearer {access_token}
+  Amazon-Advertising-API-ClientId: {client_id}
+  Content-Type: application/json
+
 {
   <span class="str">"queryText"</span>: <span class="str">"SELECT ... FROM impressions ..."</span>,
   <span class="str">"queryParameters"</span>: {},
@@ -2090,11 +2110,11 @@ streaming_views      <span class="cm">-- CTV completion events, quartile (25/50/
 <span class="cm">// Returns: { "queryExecutionId": "qe-abc123" }</span>
 
 <span class="cm">// 2. Poll status</span>
-<span class="kw">GET</span> /amc/query/{queryExecutionId}
+<span class="kw">GET</span> /amc/reporting/workgroups/{workgroupId}/queries/{queryExecutionId}
 <span class="cm">// status: "RUNNING" | "SUCCESS" | "FAILED"</span>
 
 <span class="cm">// 3. Download results from S3</span>
-<span class="cm">// On SUCCESS: response contains S3 output location</span></pre>
+<span class="cm">// On SUCCESS: response contains presigned S3 output location</span></pre>
     </div>
   </div>`
 },
@@ -2496,7 +2516,7 @@ Headers:
 <tr><th>Model ID</th><th>Best for</th><th>Context</th></tr>
 <tr><td><code>claude-opus-4-8</code></td><td>Complex reasoning, multi-step agent decisions</td><td>1M tokens</td></tr>
 <tr><td><code>claude-sonnet-4-6</code></td><td>Balanced speed + quality, report analysis</td><td>1M tokens</td></tr>
-<tr><td><code>claude-haiku-4-5</code></td><td>Fast, cheap classification tasks</td><td>200K tokens</td></tr>
+<tr><td><code>claude-haiku-4-5</code></td><td>Fast, cheap classification tasks</td><td>1M tokens</td></tr>
 </table>
 <p>For an Amazon Ads agent making bid decisions, use <strong>claude-opus-4-8</strong> — the reasoning quality directly affects your ad spend.</p>
 
@@ -2547,8 +2567,10 @@ Headers:
 <ul>
 <li>Tier 1 (new accounts): ~50 requests/min, 40K tokens/min</li>
 <li>Opus 4.8: $5 per 1M input tokens, $25 per 1M output tokens</li>
-<li>An agent cycle analyzing 100 keywords might use ~5K tokens ≈ $0.025/cycle</li>
-<li>Running every hour: ~$18/month — trivial compared to ad spend saved</li>
+<li><strong>Efficient pattern (batch all keywords in one call):</strong> 100 keywords in one prompt ≈ 15–20K input + 3K output tokens ≈ $0.15–$0.20/cycle</li>
+<li><strong>Naive pattern (one call per keyword):</strong> 100 × 2K tokens = 200K tokens ≈ $1–$2/cycle — avoid this</li>
+<li>Running hourly with batching: ~$108–$144/month — still trivial compared to ad spend saved, but batching matters</li>
+<li>Use Sonnet 4.6 ($3/$15 per 1M) for high-frequency low-complexity tasks; reserve Opus 4.8 for complex strategy decisions</li>
 </ul>
 `
 },
