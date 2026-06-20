@@ -281,6 +281,18 @@ const CURRICULUM = [
       </div>
     </div>
     <div class="callout tip">✅ CPC metrics chain: <strong>Impressions → Clicks (CTR) → Orders (CVR) → Revenue → ACOS</strong><br>CPM metrics chain: <strong>Impressions → VCR → Brand Searches → Detail Page Views → Purchases</strong></div>
+    <div class="card">
+      <h3>🗓️ What's New in Amazon Ads — 2026 Edition</h3>
+      <p>This course reflects the state of Amazon Advertising as of <strong>June 2026</strong>. Key changes from the past year:</p>
+      <table>
+        <tr><th>Update</th><th>When</th><th>What Changed</th></tr>
+        <tr><td><strong>Amazon Ads API v1</strong></td><td>GA December 2025</td><td>New unified API replacing product-specific v3 APIs. Different headers: <code>Amazon-Ads-ClientId</code> + <code>Amazon-Ads-AccountId</code>. v3 still supported during transition.</td></tr>
+        <tr><td><strong>AMC Lookback Window</strong></td><td>November 2025</td><td>Extended from 13 months → <strong>25 months</strong>. Amazon Retail Purchases dataset now covers 5 years.</td></tr>
+        <tr><td><strong>Sponsored TV Self-Serve</strong></td><td>2026</td><td>Fully self-serve in US, UK, Brazil, Mexico, and Canada. No managed-service spend requirement.</td></tr>
+        <tr><td><strong>AI-Powered Targeting</strong></td><td>February 2026</td><td>New Product Targeting and In-Market Categories using unified AI audience signals for display, video, and audio campaigns.</td></tr>
+      </table>
+      <div class="callout info">💡 This course teaches <strong>both v1 and v3</strong> — you'll encounter v3 in existing integrations and v1 in new builds. Module 3 covers the header differences.</div>
+    </div>
   </div>`
 },
 
@@ -353,6 +365,7 @@ const CURRICULUM = [
       <table>
         <tr><th>Path</th><th>Minimum</th><th>Access</th></tr>
         <tr><td><strong>Sponsored Display</strong> (self-serve)</td><td>No minimum</td><td>Seller/vendor console</td></tr>
+        <tr><td><strong>Sponsored TV</strong> (self-serve)</td><td>No minimum — fully self-serve in US, UK, Brazil, Mexico, Canada as of 2026</td><td>Amazon Ads console or API (<code>/stv/campaigns</code>)</td></tr>
         <tr><td><strong>Amazon DSP</strong> self-serve</td><td>No enforced minimum (agencies typically recommend $10K+/month for meaningful data)</td><td>DSP console or API</td></tr>
         <tr><td><strong>Amazon DSP</strong> managed service</td><td>~$35,000/quarter engagement minimum</td><td>Amazon account team</td></tr>
       </table>
@@ -510,6 +523,16 @@ const CURRICULUM = [
       </ul>
       <div class="callout info">💡 DSP uses CPM (cost per 1,000 impressions) not CPC. Self-serve DSP has no enforced minimum — agencies recommend $10K+/month for meaningful data. Managed service requires ~$35K/quarter commitment.</div>
     </div>
+    <div class="card">
+      <h3>🆕 February 2026 — Enhanced AI-Powered Targeting</h3>
+      <p>Amazon launched two new targeting types using AI-powered audience signals. These unify audience data across display, video, and audio campaigns:</p>
+      <table>
+        <tr><th>New Targeting Type</th><th>What It Does</th><th>Best For</th></tr>
+        <tr><td><strong>Product Targeting (enhanced)</strong></td><td>AI matches your ad to contextually relevant products using signals beyond just category/ASIN — includes behavioral affinity and purchase propensity models</td><td>Sponsored Display, DSP display campaigns</td></tr>
+        <tr><td><strong>In-Market Categories (AI-powered)</strong></td><td>Identifies shoppers actively in-market using unified signals from shopping, streaming, and search — more precise than the legacy in-market segments</td><td>Display, video, and audio campaigns across SD and DSP</td></tr>
+      </table>
+      <div class="callout tip">✅ These are audience-signal targets — they appear as options inside Sponsored Display and DSP campaign creation. No separate API endpoint; they surface as new <code>targetingType</code> values in the existing targeting API.</div>
+    </div>
   </div>`
 },
 
@@ -566,18 +589,30 @@ const CURRICULUM = [
     <div class="card">
       <h3>What is the Amazon Ads API?</h3>
       <p>The Amazon Advertising API is a REST API that gives programmatic access to everything in Amazon Ads: campaigns, ad groups, keywords, bids, budgets, and reports. It's the engine behind every third-party ads management tool (Perpetua, Pacvue, Skai, etc.).</p>
-      <div class="callout warn">⚠️ <strong>API v2 is deprecated.</strong> All new development must use <strong>v3</strong> for Sponsored Products, Sponsored Brands, and Sponsored Display. The v3 APIs use versioned <code>Accept</code> headers and have different request/response shapes than v2.</div>
-      <div class="callout info">🌍 <strong>Regional base URLs:</strong> The API domain is <code>advertising-api.amazon.com</code> (NOT <code>advertising.amazon.com</code>, which is the web console). Use the right region: North America → <code>advertising-api.amazon.com</code> | Europe → <code>advertising-api-eu.amazon.com</code> | Far East → <code>advertising-api-fe.amazon.com</code></div>
+      <div class="callout info">🆕 <strong>Amazon Ads API v1 — The Unified Modern API (GA December 2025):</strong> v1 is the new standard for all new integrations. It unifies Sponsored Products, Sponsored Brands, Sponsored Display, Sponsored TV, and DSP under one consistent schema and set of headers. <strong>v3 is still supported</strong> (no retirement date announced) — existing integrations keep working, but build anything new on v1.</div>
+      <div class="callout warn">⚠️ <strong>API v2 is fully deprecated.</strong> v3 is supported legacy. v1 is the recommended path for new development.</div>
+      <div class="callout info">🌍 <strong>Regional base URLs (same for v1 and v3):</strong> The API domain is <code>advertising-api.amazon.com</code> (NOT <code>advertising.amazon.com</code>). North America → <code>advertising-api.amazon.com</code> | Europe → <code>advertising-api-eu.amazon.com</code> | Far East → <code>advertising-api-fe.amazon.com</code></div>
       <table>
-        <tr><th>Product</th><th>Path (append to regional base URL)</th><th>Notes</th></tr>
-        <tr><td>Sponsored Products v3</td><td><code>/sp/campaigns</code>, <code>/sp/adGroups</code>, <code>/sp/keywords</code></td><td>Current — use versioned Accept header</td></tr>
-        <tr><td>Sponsored Brands v3</td><td><code>/sb/campaigns</code>, <code>/sb/keywords</code></td><td>Current</td></tr>
-        <tr><td>Sponsored Display v3</td><td><code>/sd/campaigns</code>, <code>/sd/targets</code></td><td>Current</td></tr>
-        <tr><td>Sponsored TV</td><td><code>/stv/campaigns</code></td><td>Newer self-serve CTV API</td></tr>
-        <tr><td>DSP</td><td><code>/dsp/campaigns</code>, <code>/dsp/lineItems</code></td><td>Separate auth scope</td></tr>
-        <tr><td>Reports v3</td><td><code>/reporting/reports</code></td><td>Async — poll for completion</td></tr>
-        <tr><td>Amazon Marketing Cloud</td><td><code>/amc/reporting/workgroups/{id}/queries</code></td><td>SQL clean room — see Module 6</td></tr>
+        <tr><th>Product</th><th>Path (append to regional base URL)</th><th>Version</th></tr>
+        <tr><td>Sponsored Products</td><td><code>/sp/campaigns</code>, <code>/sp/adGroups</code>, <code>/sp/keywords</code></td><td>v3 (supported) · v1 (new)</td></tr>
+        <tr><td>Sponsored Brands</td><td><code>/sb/campaigns</code>, <code>/sb/keywords</code></td><td>v3 (supported) · v1 (new)</td></tr>
+        <tr><td>Sponsored Display</td><td><code>/sd/campaigns</code>, <code>/sd/targets</code></td><td>v3 (supported) · v1 (new)</td></tr>
+        <tr><td>Sponsored TV</td><td><code>/stv/campaigns</code></td><td>v1 self-serve</td></tr>
+        <tr><td>DSP</td><td><code>/dsp/campaigns</code>, <code>/dsp/lineItems</code></td><td>v1 (separate auth scope)</td></tr>
+        <tr><td>Reports v3</td><td><code>/reporting/reports</code></td><td>v3 — async, poll for completion</td></tr>
+        <tr><td>Amazon Marketing Cloud</td><td><code>/amc/reporting/workgroups/{id}/queries</code></td><td>See Module 6</td></tr>
       </table>
+    </div>
+    <div class="card">
+      <h3>v1 vs v3 — Header Differences</h3>
+      <p>The biggest practical difference between v1 and v3 is the required headers. If you're building new code, use the v1 headers:</p>
+      <table>
+        <tr><th></th><th>v3 (legacy, still works)</th><th>v1 (new — use for new code)</th></tr>
+        <tr><td>Client ID</td><td><code>Amazon-Advertising-API-ClientId</code></td><td><code>Amazon-Ads-ClientId</code></td></tr>
+        <tr><td>Account scope</td><td><code>Amazon-Advertising-API-Scope</code> (Profile ID)</td><td><code>Amazon-Ads-AccountId</code> (Profile ID)</td></tr>
+        <tr><td>Auth</td><td><code>Authorization: Bearer {token}</code></td><td><code>Authorization: Bearer {token}</code></td></tr>
+      </table>
+      <div class="callout tip">✅ The OAuth2/LWA token exchange is <strong>identical</strong> for v1 and v3 — same endpoint, same grant types, same refresh flow. Only the per-request headers differ.</div>
     </div>
     <div class="card">
       <h3>Authentication — Login with Amazon (LWA)</h3>
@@ -2008,7 +2043,8 @@ You write SQL → AMC runs it in the clean room → Returns aggregated results
         <li>Access via <strong>AMC Console</strong> (UI) or <strong>AMC API</strong> (programmatic)</li>
         <li>AMC itself is <strong>free</strong> — data storage costs are minimal; you pay for the DSP spend that enables access</li>
         <li>Data latency: typically <strong>24–48 hours</strong> for most tables</li>
-        <li>Lookback window: up to <strong>13 months</strong> of historical data</li>
+        <li>Lookback window: up to <strong>25 months</strong> of historical data (extended November 2025 — was 13 months)</li>
+        <li><strong>Amazon Retail Purchases dataset</strong>: extends to <strong>5 years</strong> of purchase history for in-depth buyer behavior analysis</li>
       </ul>
     </div>
   </div>`
